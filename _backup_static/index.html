@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultorios Dra. Adriana Pagnotta | Odontología Integral</title>
+    <meta name="description"
+        content="Consultorios Dra. Adriana Pagnotta. Tratamientos dentales personalizados, estética dental, ortodoncia invisible y más.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="#" class="logo">
+                <i class="fas fa-tooth logo-icon"></i>
+                <div class="logo-text">
+                    <span class="brand">Dra. Adriana Pagnotta</span>
+                    <span class="sub-brand">Consultorios Odontológicos</span>
+                </div>
+            </a>
+
+            <div class="nav-links">
+                <a href="#inicio" class="nav-link active">Inicio</a>
+                <a href="#servicios" class="nav-link">Tratamientos</a>
+                <a href="#nosotros" class="nav-link">Nosotros</a>
+                <a href="#testimonios" class="nav-link">Pacientes</a>
+            </div>
+
+            <div class="nav-actions">
+                <a href="#contacto" class="btn btn-primary">Agendar Cita</a>
+                <button class="mobile-menu-btn" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu">
+        <div class="mobile-links">
+            <a href="#inicio">Inicio</a>
+            <a href="#servicios">Tratamientos</a>
+            <a href="#nosotros">Nosotros</a>
+            <a href="#testimonios">Pacientes</a>
+            <a href="#contacto" class="btn btn-primary mt-4">Agendar Cita</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="hero">
+        <div class="hero-bg"></div>
+        <div class="container hero-content">
+            <div class="hero-text fade-in-up">
+                <div class="badge">
+                    <i class="fas fa-star"></i> Tecnología de Vanguardia
+                </div>
+                <h1 class="hero-title">
+                    Diseñamos la <span class="highlight">Sonrisa</span><br>
+                    que mereces
+                </h1>
+                <p class="hero-subtitle">
+                    Odontología integral con un enfoque estético y minimalista.
+                    Experiencia indolora, resultados naturales y tecnología 3D.
+                </p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary icon-btn" onclick="scrollToSection('contacto')">
+                        Reservar Turno <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button class="btn btn-outline" onclick="scrollToSection('servicios')">
+                        Ver Tratamientos
+                    </button>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-num">15+</span>
+                        <span class="stat-desc">Años de <br>Experiencia</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-num">2k+</span>
+                        <span class="stat-desc">Pacientes <br>Felices</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image-container fade-in-left">
+                <!-- Placeholder for a high quality dental image, effectively mocked with CSS for now -->
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?q=80&w=1000&auto=format&fit=crop"
+                        alt="Sonrisa Radiante" class="hero-img">
+                    <div class="floating-card glass top-right">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Implantes Premium</span>
+                    </div>
+                    <div class="floating-card glass bottom-left">
+                        <i class="fas fa-magic"></i>
+                        <span>Diseño de Sonrisa</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="servicios" class="section services">
+        <div class="container">
+            <div class="section-header center">
+                <span class="tag">Nuestros Servicios</span>
+                <h2 class="section-title">Cuidado <span class="highlight">Integral</span></h2>
+                <p class="section-desc">Combinamos ciencia, arte y tecnología para brindarte soluciones dentales de
+                    excelencia.</p>
+            </div>
+
+            <div class="services-grid">
+                <!-- Odontología General -->
+                <div class="service-card">
+                    <div class="icon-box">
+                        <i class="fas fa-tooth"></i>
+                    </div>
+                    <h3>Odontología General</h3>
+                    <p>Limpieza dental profunda, tratamiento de caries, flúor, selladores y tratamiento para
+                        sensibilidad dental.</p>
+                    <a href="#contacto" class="service-link">Consultar <i class="fas fa-chevron-right"></i></a>
+                </div>
+
+                <!-- Estética Dental -->
+                <div class="service-card">
+                    <div class="icon-box">
+                        <i class="fas fa-gem"></i>
+                    </div>
+                    <h3>Estética Dental</h3>
+                    <p>Carillas, coronas, incrustaciones, blanqueamiento y diseño de sonrisa para una imagen perfecta.
+                    </p>
+                    <a href="#contacto" class="service-link">Consultar <i class="fas fa-chevron-right"></i></a>
+                </div>
+
+                <!-- Ortodoncia -->
+                <div class="service-card">
+                    <div class="icon-box">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3>Ortodoncia</h3>
+                    <p>Brackets metálicos, cerámicos, de zafiro y combinados. Ortodoncia invisible.</p>
+                    <a href="#contacto" class="service-link">Consultar <i class="fas fa-chevron-right"></i></a>
+                </div>
+
+                <!-- Implantología y Prótesis -->
+                <div class="service-card">
+                    <div class="icon-box">
+                        <i class="fas fa-shapes"></i>
+                    </div>
+                    <h3>Implantes y Prótesis</h3>
+                    <p>Implantes, coronas, puentes fijos y prótesis removibles (flexibles, acrílicas, cromocobalto).</p>
+                    <a href="#contacto" class="service-link">Consultar <i class="fas fa-chevron-right"></i></a>
+                </div>
+
+                <!-- Endodoncia -->
+                <div class="service-card">
+                    <div class="icon-box">
+                        <i class="fas fa-microscope"></i>
+                    </div>
+                    <h3>Endodoncia</h3>
+                    <p>Tratamiento de conducto y retratamiento de conductos.</p>
+                    <a href="#contacto" class="service-link">Consultar <i class="fas fa-chevron-right"></i></a>
+                </div>
+
+                <!-- Periodoncia -->
+                <div class="service-card">
+                    <div class="icon-box">
+                        <i class="fas fa-hand-holding-medical"></i>
+                    </div>
+                    <h3>Periodoncia</h3>
+                    <p>Tratamiento de gingivitis, periodontitis y limpieza profunda de encías.</p>
+                    <a href="#contacto" class="service-link">Consultar <i class="fas fa-chevron-right"></i></a>
+                </div>
+
+                <!-- Cirugía Oral -->
+                <div class="service-card">
+                    <div class="icon-box">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <h3>Cirugía Oral</h3>
+                    <p>Extracciones simples y complejas realizadas con máxima seguridad.</p>
+                    <a href="#contacto" class="service-link">Consultar <i class="fas fa-chevron-right"></i></a>
+                </div>
+
+                <!-- Otros -->
+                <div class="service-card">
+                    <div class="icon-box">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <h3>Diagnóstico y Otros</h3>
+                    <p>Odontopediatría, placas miorrelajantes para bruxismo, tomografías y radiografías.</p>
+                    <a href="#contacto" class="service-link">Consultar <i class="fas fa-chevron-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience / Why Us -->
+    <section id="nosotros" class="section why-us">
+        <div class="container split-layout">
+            <div class="content-side">
+                <span class="tag">Por Qué Elegirnos</span>
+                <h2 class="section-title">La Diferencia <span class="highlight">Pagnotta</span></h2>
+                <p class="section-desc">Entendemos que visitar al dentista puede generar ansiedad. Por eso, hemos creado
+                    un espacio pensado en tu bienestar.</p>
+
+                <ul class="features-list">
+                    <li>
+                        <div class="check-icon"><i class="fas fa-check"></i></div>
+                        <div>
+                            <h4>Tecnología 3D</h4>
+                            <p>Escáneres intraorales y radiografía digital para diagnósticos precisos.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="check-icon"><i class="fas fa-check"></i></div>
+                        <div>
+                            <h4>Ambiente Cálido</h4>
+                            <p>Sillones ergonómicos, música suave y un trato cercano.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="check-icon"><i class="fas fa-check"></i></div>
+                        <div>
+                            <h4>Atención Personalizada</h4>
+                            <p>Cada paciente es único y recibe un plan de tratamiento a medida.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="image-side">
+                <div class="composition">
+                    <img src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1000&auto=format&fit=crop"
+                        alt="Clínica Moderna" class="comp-img main-img">
+                    <img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?q=80&w=1000&auto=format&fit=crop"
+                        alt="Doctora sonriendo" class="comp-img small-img">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container cta-content">
+            <h2>¿Listo para renovar tu sonrisa?</h2>
+            <p>Agenda tu primera consulta de valoración y descubre lo que podemos hacer por ti.</p>
+            <a href="#contacto" class="btn btn-white">Reservar Cita Ahora</a>
+        </div>
+    </section>
+
+    <!-- Simple Contact Section -->
+    <section id="contacto" class="section contact">
+        <div class="container">
+            <div class="section-header center">
+                <span class="tag">Contacto</span>
+                <h2 class="section-title">Estamos <span class="highlight">Cerca de Ti</span></h2>
+            </div>
+
+            <div class="contact-wrapper">
+                <div class="contact-info-card">
+                    <h3>Información de Contacto</h3>
+                    <p>Visítanos en nuestro moderno consultorio o contáctanos por tus medios preferidos.</p>
+
+                    <div class="info-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <span>Dirección</span>
+                            <p>Av. Libertador 2400, Piso 5, Buenos Aires</p>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <span>Teléfono</span>
+                            <p>+54 11 4567 8900</p>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <span>Email</span>
+                            <p>contacto@draftpagnotta.com</p>
+                        </div>
+                    </div>
+
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+
+                <form class="contact-form glass">
+                    <div class="form-group">
+                        <label>Nombre Completo</label>
+                        <input type="text" placeholder="Ej. Juan Pérez" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" placeholder="Ej. juan@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="tel" placeholder="Ej. 11 1234 5678">
+                    </div>
+                    <div class="form-group">
+                        <label>Mensaje</label>
+                        <textarea rows="4" placeholder="¿En qué podemos ayudarte?"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary full-width">Enviar Mensaje</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-brand">
+                <div class="logo-text white">
+                    <span class="brand">Dra. Adriana Pagnotta</span>
+                    <span class="sub-brand">Consultorios Odontológicos</span>
+                </div>
+                <p>Odontología de excelencia con tecnología de vanguardia y calidez humana.</p>
+            </div>
+
+            <div class="footer-links">
+                <h4>Enlaces</h4>
+                <a href="#inicio">Inicio</a>
+                <a href="#servicios">Tratamientos</a>
+                <a href="#nosotros">Nosotros</a>
+                <a href="#contacto">Contacto</a>
+            </div>
+
+            <div class="footer-links">
+                <h4>Tratamientos</h4>
+                <a href="#">Implantes</a>
+                <a href="#">Ortodoncia</a>
+                <a href="#">Estética</a>
+                <a href="#">Blanqueamiento</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Consultorios Dra. Adriana Pagnotta. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
