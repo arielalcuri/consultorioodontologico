@@ -188,7 +188,7 @@ export const updateBotKnowledge = (newData) => {
 const SITE_CONFIG_KEY = 'dental_clinic_site_config_v1'
 const defaultSiteConfig = {
     heroImage: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1000&auto=format&fit=crop',
-    aboutImage: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?q=80&w=1000&auto=format&fit=crop',
+    aboutImage: 'https://estudidentalbarcelona.com/wp-content/uploads/2017/08/tomografia-dientes.jpg',
     faqs: [
         { id: 1, q: '¿Aceptan obras sociales?', a: 'Sí, trabajamos con OSDE, Swiss Medical, Galeno y Medicus.' },
         { id: 2, q: '¿Tienen estacionamiento?', a: 'Hay estacionamiento libre sobre la calle Cosquín y alrededores.' },
