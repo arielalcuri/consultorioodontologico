@@ -305,6 +305,17 @@ const submitBooking = async () => {
   if (!isTuTh.value) return
   submitting.value = true
   
+  // Registrar al usuario automáticamente si no existe para que el ChatBot lo reconozca
+  registerUser({
+    name: form.value.firstName,
+    lastName: form.value.lastName,
+    dni: form.value.dni,
+    email: form.value.email,
+    phone: form.value.phone,
+    birthDate: form.value.birthDate,
+    password: 'paciente' // Clave por defecto
+  })
+
   addTurno({
     firstName: form.value.firstName,
     lastName: form.value.lastName,

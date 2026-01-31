@@ -132,6 +132,9 @@
 
       <!-- Usuarios Tab -->
       <section v-if="currentTab === 'usuarios'" class="tab-content">
+        <div class="mb-4">
+          <button @click="openNewUserModal" class="btn btn-primary"><i class="fas fa-user-plus"></i> Nuevo Paciente</button>
+        </div>
         <div class="table-container">
           <table>
             <thead>
@@ -312,7 +315,28 @@
       </div>
     </div>
     
-    <!-- User and Service Modals (Omitting for brevity, but they should be present) -->
+    <!-- New User Modal -->
+    <div v-if="showNewUserModal" class="modal-overlay" @click.self="showNewUserModal = false">
+       <div class="modal-content admin-modal scale-in">
+         <h3>Nuevo Paciente</h3>
+         <form @submit.prevent="saveNewUser" class="edit-form mt-4">
+            <div class="form-row">
+              <div class="form-group"><label>Nombre</label><input v-model="newUserForm.name" required></div>
+              <div class="form-group"><label>Apellido</label><input v-model="newUserForm.lastName" required></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>DNI</label><input v-model="newUserForm.dni" required></div>
+              <div class="form-group"><label>Teléfono</label><input v-model="newUserForm.phone" required></div>
+            </div>
+            <div class="form-group"><label>Email</label><input v-model="newUserForm.email" type="email" required></div>
+            <div class="form-group"><label>Fecha Nacimiento</label><input v-model="newUserForm.birthDate" type="date"></div>
+            <div class="form-group"><label>Contraseña Acceso</label><input v-model="newUserForm.password" type="text" placeholder="Clave para el portal"></div>
+            <button type="submit" class="btn btn-primary btn-full">Registrar Paciente</button>
+         </form>
+       </div>
+    </div>
+
+    <!-- Edit User Modal -->
     <div v-if="showEditUserModal" class="modal-overlay" @click.self="showEditUserModal = false">
        <div class="modal-content admin-modal scale-in">
          <h3>Editar Paciente</h3>
@@ -368,12 +392,14 @@ const weekDays = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
 const showConfirmModal = ref(false)
 const showEditModal = ref(false)
 const showEditUserModal = ref(false)
+const showNewUserModal = ref(false)
 const showServiceModal = ref(false)
 
 const selectedTurno = ref(null)
 const assignedTime = ref('')
 const editForm = ref({})
 const editUserForm = ref({})
+const newUserForm = ref({ name: '', lastName: '', dni: '', email: '', phone: '', birthDate: '', password: 'admin' })
 const serviceForm = ref({ title: '', description: '', icon: 'fas fa-tooth' })
 const isEditingService = ref(false)
 
@@ -428,6 +454,12 @@ const saveEdit = () => { updateTurno(selectedTurno.value.id, editForm.value); sh
 const handleDelete = (id) => { if (confirm('¿Eliminar turno?')) deleteTurno(id) }
 
 const openEditUserModal = (user) => { editUserForm.value = { ...user }; showEditUserModal.value = true; }
+const openNewUserModal = () => { newUserForm.value = { name: '', lastName: '', dni: '', email: '', phone: '', birthDate: '', password: 'admin' }; showNewUserModal.value = true; }
+const saveNewUser = () => { 
+  allUsers.value.push({ ...newUserForm.value }); 
+  showNewUserModal.value = false;
+  alert('Paciente registrado exitosamente en LocalStorage');
+}
 const saveUserEdit = () => { updateUser(editUserForm.value.email, editUserForm.value); showEditUserModal.value = false; }
 const handleDeleteUser = (email) => { if (confirm('¿Eliminar usuario?')) deleteUser(email) }
 
