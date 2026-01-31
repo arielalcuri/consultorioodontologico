@@ -183,3 +183,26 @@ watch(botKnowledge, (newVal) => {
 export const updateBotKnowledge = (newData) => {
     botKnowledge.value = { ...botKnowledge.value, ...newData }
 }
+
+// --- SITE CONFIG STORE (Images & FAQs) ---
+const SITE_CONFIG_KEY = 'dental_clinic_site_config_v1'
+const defaultSiteConfig = {
+    heroImage: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1000&auto=format&fit=crop',
+    aboutImage: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?q=80&w=1000&auto=format&fit=crop',
+    faqs: [
+        { id: 1, q: '¿Aceptan obras sociales?', a: 'Sí, trabajamos con OSDE, Swiss Medical, Galeno y Medicus.' },
+        { id: 2, q: '¿Tienen estacionamiento?', a: 'Hay estacionamiento libre sobre la calle Cosquín y alrededores.' },
+        { id: 3, q: '¿Atienden urgencias?', a: 'Atendemos urgencias dentro de nuestro horario de atención (Martes y Jueves). Para urgencias fuera de horario, recomendamos dirigirse a su guardia de prepaga.' }
+    ]
+}
+
+const storedConfig = localStorage.getItem(SITE_CONFIG_KEY)
+export const siteConfig = ref(storedConfig ? JSON.parse(storedConfig) : defaultSiteConfig)
+
+watch(siteConfig, (newVal) => {
+    localStorage.setItem(SITE_CONFIG_KEY, JSON.stringify(newVal))
+}, { deep: true })
+
+export const updateSiteConfig = (newData) => {
+    siteConfig.value = { ...siteConfig.value, ...newData }
+}

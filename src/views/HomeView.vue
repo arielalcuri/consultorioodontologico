@@ -65,7 +65,7 @@
             <i class="fas fa-check-circle"></i>
             <span>Implantes Certificados</span>
           </div>
-          <img src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1000&auto=format&fit=crop" alt="Clínica" class="main-hero-img">
+          <img :src="siteConfig.heroImage" alt="Clínica" class="main-hero-img">
         </div>
       </div>
     </section>
@@ -97,7 +97,7 @@
             <span class="num">20+</span>
             <span class="txt">Años de <br>Trayectoria</span>
           </div>
-          <img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?q=80&w=1000&auto=format&fit=crop" alt="Profesional" class="about-img">
+          <img :src="siteConfig.aboutImage" alt="Profesional" class="about-img">
         </div>
         <div class="text-side">
           <span class="tag">Sobre Nosotros</span>
@@ -108,6 +108,29 @@
             <li><i class="fas fa-check-circle"></i> Equipamiento de última generación</li>
             <li><i class="fas fa-check-circle"></i> Ubicación privilegiada en Villa Lugano</li>
           </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="section bg-light">
+      <div class="container max-w-2xl">
+        <div class="section-header text-center">
+          <span class="tag">Dudas comunes</span>
+          <h2 class="section-title">Preguntas <span class="highlight-text">Frecuentes</span></h2>
+        </div>
+        <div class="faq-accordion mt-8">
+          <div v-for="(faq, index) in siteConfig.faqs" :key="faq.id" 
+               class="faq-item" :class="{ 'active': activeFaq === index }"
+               @click="activeFaq = activeFaq === index ? -1 : index">
+            <div class="faq-question">
+              <h3>{{ faq.q }}</h3>
+              <i class="fas" :class="activeFaq === index ? 'fa-minus' : 'fa-plus'"></i>
+            </div>
+            <div class="faq-answer" v-show="activeFaq === index">
+              <p>{{ faq.a }}</p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -221,13 +244,14 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import ChatBot from '../components/ChatBot.vue'
-import { allServices, addTurno } from '../store'
+import { allServices, addTurno, registerUser, siteConfig } from '../store'
 
 const scrollY = ref(0)
 const mobileMenuOpen = ref(false)
 const showModal = ref(false)
 const submitting = ref(false)
 const success = ref(false)
+const activeFaq = ref(0)
 
 const today = new Date().toISOString().split('T')[0]
 const feriados = ref([])
@@ -455,4 +479,16 @@ input::placeholder, textarea::placeholder { color: #94a3b8; }
 .scale-in { animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* FAQ Styles */
+.max-w-2xl { max-width: 800px !important; }
+.faq-accordion { display: flex; flex-direction: column; gap: 1rem; }
+.faq-item { background: white; border-radius: 1.5rem; padding: 1.5rem 2rem; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 2px solid transparent; }
+.faq-item:hover { border-color: #0e7490; transform: translateY(-3px); }
+.faq-item.active { border-color: #0e7490; background: #ecfeff; }
+.faq-question { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.faq-question h3 { font-size: 1.1rem; font-weight: 700; margin: 0; color: #1e293b; }
+.faq-question i { color: #0e7490; font-size: 0.9rem; }
+.faq-answer { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(14, 116, 144, 0.1); animation: fadeIn 0.4s ease-out; }
+.faq-answer p { color: #64748b; line-height: 1.7; margin: 0; }
 </style>

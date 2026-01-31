@@ -11,6 +11,9 @@
           <i :class="tab.icon"></i> {{ tab.name }}
           <span v-if="tab.id === 'solicitudes' && pendingCount > 0" class="badge-count">{{ pendingCount }}</span>
         </button>
+        <button @click="currentTab = 'web'" :class="{ active: currentTab === 'web' }">
+          <i class="fas fa-globe"></i> Web
+        </button>
       </nav>
       <button class="logout-btn" @click="handleLogout">
         <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
@@ -196,6 +199,63 @@
         </div>
       </section>
 
+      <!-- Web Config Tab -->
+      <section v-if="currentTab === 'web'" class="tab-content">
+        <div class="chatbot-admin-container">
+          <div class="admin-card mb-8">
+            <div class="card-header">
+              <i class="fas fa-image"></i>
+              <h3>Imágenes del Sitio</h3>
+            </div>
+            <div class="p-6">
+              <div class="chatbot-config-grid">
+                <div class="form-group">
+                  <label>Imagen Hero (Principal)</label>
+                  <input v-model="siteConfig.heroImage" class="input-modern" placeholder="URL de la imagen">
+                  <div class="preview-img-admin mt-2">
+                    <img :src="siteConfig.heroImage" alt="Hero Preview">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Imagen Nosotros (Sobre Adriana)</label>
+                  <input v-model="siteConfig.aboutImage" class="input-modern" placeholder="URL de la imagen">
+                  <div class="preview-img-admin mt-2">
+                    <img :src="siteConfig.aboutImage" alt="About Preview">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="admin-card">
+            <div class="card-header flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-list-ul"></i>
+                <h3>Preguntas Frecuentes (FAQ en Home)</h3>
+              </div>
+              <button @click="siteConfig.faqs.unshift({ id: Date.now(), q: '', a: '' })" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus"></i> Nueva FAQ
+              </button>
+            </div>
+            <div class="p-6">
+              <div class="faq-management-list">
+                <div v-for="(faq, index) in siteConfig.faqs" :key="faq.id" class="faq-editor-card">
+                  <div class="faq-editor-main">
+                    <input v-model="faq.q" placeholder="Pregunta (Ej: ¿Tienen WiFi?)" class="input-modern mb-2">
+                    <textarea v-model="faq.a" placeholder="Respuesta..." rows="2" class="input-modern"></textarea>
+                  </div>
+                  <div class="faq-editor-side">
+                    <button @click="siteConfig.faqs.splice(index, 1)" class="btn-action-delete">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- ChatBot Config Tab -->
       <section v-if="currentTab === 'chatbot'" class="tab-content">
         <div class="chatbot-admin-container">
@@ -369,7 +429,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { allTurnos, updateTurno, deleteTurno, allUsers, updateUser, deleteUser, allServices, addService, updateService, deleteService, botKnowledge } from '../store'
+import { allTurnos, updateTurno, deleteTurno, allUsers, updateUser, deleteUser, allServices, addService, updateService, deleteService, botKnowledge, siteConfig } from '../store'
 
 const router = useRouter()
 const currentTab = ref('agenda')
@@ -570,4 +630,7 @@ input, select, textarea { padding: 0.8rem; border: 1px solid #e2e8f0; border-rad
 @keyframes slideUpBounce { from { transform: translateX(-50%) translateY(100px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
 
 .no-data-msg { text-align: center; padding: 4rem 2rem; background: #f8fafc; border-radius: 1.5rem; border: 2px dashed #e2e8f0; color: #64748b; }
+.preview-img-admin { border-radius: 0.5rem; overflow: hidden; height: 80px; border: 1px solid #e2e8f0; }
+.preview-img-admin img { width: 100%; height: 100%; object-fit: cover; }
+.btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
 </style>
