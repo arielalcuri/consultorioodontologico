@@ -2,6 +2,9 @@
 
 ¡Bienvenido al repositorio oficial del sistema de gestión para el **Consultorio Odontológico Adriana**! Este proyecto combina una estética premium con funcionalidades de vanguardia, destacando un **ChatBot con Inteligencia Artificial** para la autogestión de pacientes.
 
+> [!IMPORTANT]
+> **Nota de Desarrollo / Modo Demo:** Actualmente el proyecto se encuentra en **fase de prueba/demostración**. Los datos de pacientes y turnos se almacenan mediante **LocalStorage** (memoria local del navegador). Esto significa que los cambios realizados en un dispositivo no se sincronizarán con otros. Para su puesta en producción y sincronización multiplataforma, se requiere la configuración de una base de datos persistente (como Firebase Firestore).
+
 ## 🚀 Características Principales
 
 *   **🤖 ChatBot AI Dental:**
