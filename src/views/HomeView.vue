@@ -34,7 +34,9 @@
 
     <!-- Mobile Menu Panel -->
     <div class="mobile-menu" :class="{ 'active': menuOpen }">
-      <button class="close-menu-btn" @click="menuOpen = false">&times;</button>
+      <button class="close-menu-btn" @click="menuOpen = false">
+        <i class="fas fa-times"></i>
+      </button>
       <div class="mobile-links">
         <a href="#inicio" @click="menuOpen = false">Inicio</a>
         <a href="#servicios" @click="menuOpen = false">Tratamientos</a>
@@ -538,7 +540,14 @@ input::placeholder, textarea::placeholder { color: #94a3b8; }
   box-shadow: -10px 0 30px rgba(0,0,0,0.2);
 }
 .mobile-menu.active { right: 0; }
-.close-menu-btn { position: absolute; top: 1.5rem; right: 1.5rem; background: #f1f5f9; border: none; font-size: 2.5rem; line-height: 1; cursor: pointer; color: #0e7490; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.3s; z-index: 1550; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+.close-menu-btn { 
+  position: absolute; top: 1.5rem; right: 1.5rem; 
+  background: #f1f5f9; border: 2px solid #e2e8f0; 
+  font-size: 1.5rem; color: #0e7490; 
+  width: 50px; height: 50px; border-radius: 50%; 
+  display: flex !important; align-items: center; justify-content: center; 
+  cursor: pointer; z-index: 2000; box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+}
 .close-menu-btn:hover { background: #e2e8f0; transform: rotate(90deg); }
 .mobile-links { display: flex; flex-direction: column; gap: 2rem; }
 .mobile-links a { font-size: 1.4rem; font-weight: 700; text-decoration: none; color: #1e293b; display: flex; align-items: center; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #f1f5f9; transition: 0.3s; }
