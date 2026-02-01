@@ -27,6 +27,7 @@
           <span></span>
         </button>
       </div>
+     </div>
     </nav>
 
     <!-- Mobile Menu Overlay (Click Outside to Close) -->
@@ -556,7 +557,6 @@ input::placeholder, textarea::placeholder { color: #94a3b8; }
   .navbar { padding: 0.5rem 0; }
   .hero-content { grid-template-columns: 1fr; text-align: center; }
   .hero-title { font-size: 2.5rem; }
-}
   .hero-subtitle { margin: 0 auto 3rem; }
   .hero-buttons { justify-content: center; }
   .hero-image-wrapper { display: none; }
