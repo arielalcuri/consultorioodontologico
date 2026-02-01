@@ -427,6 +427,8 @@ const submitBooking = async () => {
 .navbar.scrolled { height: 70px; }
 .nav-container { display: flex; justify-content: space-between; align-items: center; width: 100%; position: relative; }
 .logo { text-decoration: none; display: flex; align-items: center; gap: 0.8rem; z-index: 1300; }
+.logo .brand { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: #0e7490; line-height: 1.1; display: block; }
+.logo .sub-brand { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; display: block; font-weight: 500; }
 .nav-actions { display: flex; align-items: center; gap: 1rem; z-index: 1300; }
 .nav-links { display: flex; gap: 2.5rem; }
 .nav-link { text-decoration: none; color: #1e293b; font-weight: 600; font-size: 0.95rem; transition: 0.3s; }
