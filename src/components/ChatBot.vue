@@ -92,106 +92,168 @@ const messageContainer = ref(null)
 const inputField = ref(null)
 const showBadge = ref(true)
 
-// Opciones rápidas (Chips)
-const currentOptions = ref([])
-
-const defaultOptions = [
-  { label: '📅 Reservar Turno', action: 'turno' },
-  { label: '🦷 Tratamientos', action: 'servicios' },
-  { label: '📍 Ubicación', action: 'ubicacion' },
-  { label: '📞 Contacto', action: 'contacto' }
-]
-
-const getTime = () => {
-  const now = new Date()
-  return now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0')
-}
-
-const messages = ref([
-  { role: 'bot', text: '¡Hola! Soy la IA de la Dra. Pagnotta 🦷. Estoy aquí para ayudarte a agendar turnos, resolver dudas y guiarte en tu salud dental. ¿Qué necesitas hoy?', time: getTime() }
-])
-
-onMounted(() => {
-  currentOptions.value = defaultOptions
-  setTimeout(() => showBadge.value = false, 5000)
+const bookingState = ref({
+  active: false,
+  extractedUser: null,
+  extractedDate: null,
+  extractedService: null,
+  cancelMode: false,
+  serviceMode: false,
+  customMode: false,
+  registrationMode: false, // Nuevo: Modo Registro
+  regStep: 0, // 0: Nombre, 1: Apellido, 2: Email, 3: Teléfono
+  tempUser: {}, // Datos temporales del usuario nuevo
+  startActionAfterReg: null, // Acción a ejecutar post-registro
+  turnosToList: []
 })
 
-const toggleChat = () => {
-  isOpen.value = !isOpen.value
-  if (isOpen.value) {
-    showBadge.value = false
-    nextTick(() => {
-      scrollToBottom()
-      if(inputField.value) inputField.value.focus()
-    })
-  }
+// Función para normalizar texto (quitar tildes y pasar a minúsculas)
+const normalizeText = (text) => {
+  if (!text) return ""
+  return text.toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
 }
 
-const scrollToBottom = () => {
-  if (messageContainer.value) {
-    messageContainer.value.scrollTo({
-      top: messageContainer.value.scrollHeight,
-      behavior: 'smooth'
-    })
-  }
+const extractDni = (text) => {
+  const match = text.replace(/\./g, '').match(/\d{7,10}/)
+  return match ? match[0] : null
 }
 
-const handleOptionClick = (opt) => {
-  userInput.value = opt.label // Simular escritura
-  sendMessage(null, opt.action)
-}
-
-// --- LÓGICA INTELIGENTE V2 ---
-
-const processIntent = (input, forceAction = null) => {
-  const lower = input.toLowerCase()
-  let response = ""
-  let nextOpts = defaultOptions // Volver a las opciones por defecto tras responder
-
-  // Si hay una acción forzada por botón
-  if (forceAction === 'turno') {
-    response = "Para reservar, podés usar nuestro botón 'Reservar Cita' en la parte superior o decirme tu nombre y DNI si ya sos paciente nuestro."
-    nextOpts = [{ label: '📝 Ver mis turnos', action: 'mis_turnos' }]
-  } 
-  else if (forceAction === 'servicios') {
-    const list = allServices.value.map(s => `• ${s.title}`).join('<br>')
-    response = `Realizamos los siguientes tratamientos especializados:<br><br>${list}<br><br>¿Te interesa alguno en particular?`
-  }
-  else if (forceAction === 'ubicacion') {
-    response = "Estamos ubicados en <strong>Cosquín 4809</strong>, Villa Lugano, CABA. <br>📍 <a href='https://maps.google.com' target='_blank' style='color:#0e7490;text-decoration:underline'>Ver en Mapa</a>"
-  }
-  else if (forceAction === 'contacto') {
-    response = "📞 Teléfono fijo: <strong>4601-8957</strong><br>📱 WhatsApp: <strong>11 3001-9567</strong><br>⏰ Horarios: Mar y Jue de 15:30 a 20:00hs."
-    nextOpts = [{ label: '💬 Ir a WhatsApp', action: 'whatsapp_link' }]
-  }
-  else if (forceAction === 'whatsapp_link') {
-    window.open('https://wa.me/5491130019567', '_blank')
-    response = "Te he abierto el chat de WhatsApp en otra pestaña. ¡Gracías!"
-  }
-  // Procesamiento de Texto Libre
-  else if (lower.includes('hola') || lower.includes('buen')) {
-    response = "¡Hola! ¿Cómo estás? ¿En qué puedo ayudarte hoy?"
-  }
-  else if (lower.includes('precio') || lower.includes('costo') || lower.includes('valor')) {
-    response = "Cada sonrisa es única. Para darte un presupuesto exacto, la Dra. Adriana necesita evaluarte. La consulta inicial es fundamental para un diagnóstico preciso."
-    nextOpts = [{ label: '📅 Agendar Evaluación', action: 'turno' }]
-  }
-  else if (lower.includes('obra social') || lower.includes('prepaga')) {
-    response = botKnowledge.value.insuranceInfo || "Por el momento trabajamos de manera particular para garantizar la máxima calidad en materiales y tiempo de atención. Emitimos factura para reintegros."
-  }
-  // Fallback
-  else {
-    // Buscar en FAQ
-    const foundFaq = botKnowledge.value.faqs.find(f => lower.includes(f.q.toLowerCase()))
-    if (foundFaq) {
-      response = foundFaq.a
-    } else {
-      response = "Mmm... no estoy seguro de entender esa consulta específica. 🤔 Pero puedo conectarte directamente con la secretaría."
-      nextOpts = [{ label: '💬 Hablar con Secretaria', action: 'whatsapp_link' }, { label: '📅 Reservar Turno', action: 'turno' }]
+const extractDateStr = (text) => {
+  const months = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+  const regex = /(\d{1,2})\s+de\s+([a-zA-Z]+)/i
+  const match = normalizeText(text).match(regex)
+  if (match) {
+    const day = parseInt(match[1])
+    const month = months.indexOf(match[2])
+    if (month !== -1) {
+      return `2026-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
     }
   }
+  return null
+}
 
-  return { text: response, options: nextOpts }
+const extractService = (text) => {
+  const normalizedInput = normalizeText(text)
+  return allServices.value.find(s => {
+    const normalizedService = normalizeText(s.title)
+    return normalizedInput.includes(normalizedService)
+  })
+}
+
+const formatDateFriendly = (dateStr) => {
+  if (!dateStr) return ''
+  const [y, m, d] = dateStr.split('-')
+  const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+  return `${parseInt(d)} de ${months[parseInt(m)-1]}`
+}
+const feriados = ref([])
+
+// Cargar feriados
+const fetchFeriados = async () => {
+  try {
+    const res = await fetch('https://api.argentinadatos.com/v1/feriados/2026')
+    if (res.ok) feriados.value = await res.json()
+  } catch (e) { console.error(e) }
+}
+fetchFeriados()
+
+const messages = ref([
+  { role: 'bot', text: botKnowledge.value.welcome }
+])
+
+const toggleChat = () => { isOpen.value = !isOpen.value }
+const scrollToBottom = () => { if (messageContainer.value) messageContainer.value.scrollTop = messageContainer.value.scrollHeight }
+
+// --- MOTOR DE INTELIGENCIA (NLP SIMULATION) ---
+const intents = [
+  {
+    id: 'saludo',
+    patterns: ['hola', 'hey', 'buen dia', 'buenas tardes', 'como estas', 'saludos', 'quien sos'],
+    response: botKnowledge.value.welcome
+  },
+  {
+    id: 'turnos',
+    patterns: ['turno', 'cita', 'agendar', 'reservar', 'visita', 'dental', 'sacar'],
+    response: botKnowledge.value.appointmentInfo
+  },
+  {
+    id: 'servicios',
+    patterns: ['hacen', 'especialidad', 'servicio', 'tratamiento', 'haces', 'ofrecen', 'limpieza', 'carilla', 'implante', 'ortodoncia'],
+    get response() {
+      const list = allServices.value.map(s => s.title).join(', ')
+      return `Nuestra clínica ofrece tratamientos especializados en: <strong>${list}</strong>. ¿Te gustaría información detallada sobre alguno de ellos en particular?`
+    }
+  },
+  {
+    id: 'contacto',
+    patterns: ['telefono', 'numero', 'whatsapp', 'llamar', 'celular', 'contacto', 'comunicar'],
+    response: botKnowledge.value.contactInfo
+  },
+  {
+    id: 'ubicacion',
+    patterns: ['donde', 'direccion', 'ubicados', 'llegar', 'mapa', 'calle', 'lugano'],
+    response: botKnowledge.value.locationInfo || 'Estamos en Cosquín 4809, Villa Lugano, CABA.'
+  },
+  {
+    id: 'precios',
+    patterns: ['cuanto', 'precio', 'cuesta', 'valor', 'presupuesto', 'costo', 'barato', 'pago'],
+    response: 'Los costos varían según cada diagnóstico. Te sugerimos agendar una consulta inicial para que la Dra. Adriana pueda evaluarte y brindarte un presupuesto preciso y profesional.'
+  },
+  {
+    id: 'obras_sociales',
+    patterns: ['obra social', 'prepaga', 'osde', 'swiss', 'galeno', 'medicus', 'cobertura', 'aceptan', 'toman'],
+    response: botKnowledge.value.insuranceInfo
+  }
+]
+
+// --- LÓGICA DE REGISTRO PASO A PASO ---
+const handleRegistration = (text) => {
+  let response = ""
+  const state = bookingState.value
+
+  if (state.regStep === 0) { // Nombre
+    state.tempUser.firstName = text
+    state.regStep++
+    response = `Perfecto ${text}. ¿Cuál es tu <strong>Apellido</strong>?`
+  } else if (state.regStep === 1) { // Apellido
+    state.tempUser.lastName = text
+    state.regStep++
+    response = "Gracias. Ahora necesito tu <strong>Email</strong> para enviarte confirmaciones:"
+  } else if (state.regStep === 2) { // Email
+    state.tempUser.email = text
+    state.regStep++
+    response = "¡Casi listo! Por último, indícame un <strong>Teléfono</strong> de contacto:"
+  } else if (state.regStep === 3) { // Teléfono / Finalizar
+    state.tempUser.phone = text
+    
+    // Crear el usuario real
+    const newUser = {
+      name: state.tempUser.firstName,
+      lastName: state.tempUser.lastName,
+      dni: state.tempUser.dni,
+      email: state.tempUser.email,
+      phone: state.tempUser.phone,
+      birthDate: new Date().toISOString().split('T')[0], // Default hoy
+      password: 'paciente'
+    }
+    
+    registerUser(newUser) // Guardar en store
+    
+    state.extractedUser = newUser // Auto-login en el contexto del chat
+    state.active = true // Usuario activo
+    state.registrationMode = false // Fin registro
+    
+    response = `¡Registro completado con éxito, <strong>${newUser.name}</strong>! 🎉<br>Ya eres parte de nuestra base de pacientes.<br><br>¿Te gustaría agendar ese turno ahora?`
+    
+    // Restaurar contexto previo si existía intención
+    if (state.startActionAfterReg) {
+      setTimeout(() => sendMessage(null, state.startActionAfterReg), 1500)
+    }
+  }
+  
+  return { text: response, options: [] }
 }
 
 const sendMessage = (e, forceAction = null) => {
@@ -199,15 +261,46 @@ const sendMessage = (e, forceAction = null) => {
   if (!text && !forceAction) return
 
   // User Message
-  messages.value.push({ role: 'user', text: text, time: getTime() })
+  if (!forceAction) {
+    messages.value.push({ role: 'user', text: text, time: getTime() })
+  }
   userInput.value = ''
   currentOptions.value = [] // Ocultar opciones mientras piensa
   isTyping.value = true
   scrollToBottom()
 
-  // Simular delay de pensamiento IA
   setTimeout(() => {
-    const result = processIntent(text, forceAction)
+    let result = { text: "", options: [] }
+
+    // --- MODO REGISTRO ---
+    if (bookingState.value.registrationMode && !forceAction) {
+      result = handleRegistration(text)
+    } 
+    else {
+      // --- FLUJO NORMAL ---
+      const lower = text.toLowerCase()
+      
+      // Chequear DNI en flujo general
+      const dni = extractDni(lower)
+      
+      if (dni) {
+          const user = findUserByDetails(dni, lower)
+          if (user) {
+              bookingState.value.extractedUser = user
+              bookingState.value.active = true
+              result = { text: `¡Hola de nuevo <strong>${user.name}</strong>! Te he identificado. ¿Qué deseas hacer hoy?`, options: defaultOptions }
+          } else {
+              // INICIAR REGISTRO SI NO EXISTE
+              bookingState.value.registrationMode = true
+              bookingState.value.regStep = 0
+              bookingState.value.tempUser = { dni: dni } // Guardamos DNI
+              bookingState.value.startActionAfterReg = forceAction // Guardar intención original
+              result = { text: `No encuentro el DNI <strong>${dni}</strong> en mi sistema. 😕<br><br>¡Pero no hay problema! Vamos a registrarte rápidamente.<br>Por favor, dime tu <strong>Nombre</strong> (sin apellido):`, options: [] }
+          }
+      } else {
+          result = processIntent(text, forceAction)
+      }
+    }
     
     messages.value.push({ role: 'bot', text: result.text, time: getTime() })
     isTyping.value = false
