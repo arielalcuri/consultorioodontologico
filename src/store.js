@@ -123,14 +123,14 @@ export const deleteUser = (email) => {
 
 // SERVICES STORE
 const defaultServices = [
-    { id: 1, title: 'Estética Dental', description: 'Carillas, coronas y diseño de sonrisa.', icon: 'fas fa-gem' },
-    { id: 2, title: 'Ortodoncia', description: 'Brackets metálicos, cerámicos y zafiro.', icon: 'fas fa-teeth-open' },
-    { id: 3, title: 'Implantes', description: 'Reposición dental con tecnología de punta.', icon: 'fas fa-shapes' },
-    { id: 4, title: 'Endodoncia', description: 'Tratamiento de conducto avanzado.', icon: 'fas fa-microscope' },
-    { id: 5, title: 'Prótesis', description: 'Soluciones fijas y removibles para tu dentadura.', icon: 'fas fa-user-md' }
+    { id: 1, title: 'Estética Dental', description: 'Carillas, coronas y diseño de sonrisa.', icon: 'fas fa-gem', image: '' },
+    { id: 2, title: 'Ortodoncia', description: 'Brackets metálicos, cerámicos y zafiro.', icon: 'fas fa-teeth-open', image: 'https://neuroncdn.com/cdn-0001/7ad87ade3f518397f0d5a5236a18cbba3158cabbf035f5fca872c426744003c7?ts=1727129627' },
+    { id: 3, title: 'Implantes', description: 'Reposición dental con tecnología de punta.', icon: 'fas fa-shapes', image: '' },
+    { id: 4, title: 'Endodoncia', description: 'Tratamiento de conducto avanzado.', icon: 'fas fa-microscope', image: '' },
+    { id: 5, title: 'Prótesis', description: 'Soluciones fijas y removibles para tu dentadura.', icon: 'fas fa-user-md', image: '' }
 ]
 
-const SERVICE_KEY = 'dental_clinic_services_v1'
+const SERVICE_KEY = 'dental_clinic_services_v2'
 const storedServices = localStorage.getItem(SERVICE_KEY)
 export const allServices = ref(storedServices ? JSON.parse(storedServices) : defaultServices)
 

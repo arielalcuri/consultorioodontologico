@@ -78,16 +78,33 @@
           <h2 class="section-title">Especialidades <span class="highlight-text">Premium</span></h2>
         </div>
         <div class="services-grid">
-          <div v-for="service in allServices" :key="service.id" class="service-card-modern">
+          <div v-for="service in allServices" :key="service.id" 
+               class="service-card-modern" :class="{ 'clickable': service.image }"
+               @click="service.image ? openLightbox(service) : null">
             <div class="service-icon-wrapper">
               <i :class="service.icon"></i>
             </div>
             <h3>{{ service.title }}</h3>
             <p>{{ service.description }}</p>
+            <span v-if="service.image" class="view-more">Ver tratamiento <i class="fas fa-arrow-right"></i></span>
           </div>
         </div>
       </div>
     </section>
+
+    <!-- Lightbox Modal -->
+    <div v-if="selectedServiceImg" class="modal-overlay lightbox" @click="selectedServiceImg = null">
+      <div class="lightbox-content scale-in" @click.stop>
+        <button class="close-lightbox" @click="selectedServiceImg = null">&times;</button>
+        <div class="lightbox-img-wrapper">
+          <img :src="selectedServiceImg.image" :alt="selectedServiceImg.title">
+        </div>
+        <div class="lightbox-footer">
+          <h3>{{ selectedServiceImg.title }}</h3>
+          <p>{{ selectedServiceImg.description }}</p>
+        </div>
+      </div>
+    </div>
 
     <!-- About Section -->
     <section id="nosotros" class="section">
@@ -251,6 +268,11 @@ const showModal = ref(false)
 const submitting = ref(false)
 const success = ref(false)
 const activeFaq = ref(0)
+const selectedServiceImg = ref(null)
+
+const openLightbox = (service) => {
+  selectedServiceImg.value = service
+}
 
 const today = new Date().toISOString().split('T')[0]
 const feriados = ref([])
@@ -435,9 +457,22 @@ const submitBooking = async () => {
 .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 4rem; }
 .service-card-modern { background: white; padding: 3rem 2rem; border-radius: 2rem; transition: 0.4s; border-bottom: 5px solid transparent; }
 .service-card-modern:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.05); border-bottom-color: #0e7490; }
+.service-card-modern.clickable { cursor: pointer; }
 .service-icon-wrapper { width: 60px; height: 60px; background: #ecfeff; border-radius: 1.2rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #0e7490; margin-bottom: 2rem; }
 .service-card-modern h3 { margin-bottom: 1rem; }
 .service-card-modern p { color: #64748b; }
+.view-more { display: inline-block; margin-top: 1.5rem; color: #0e7490; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+
+/* Lightbox Styles */
+.lightbox { z-index: 3000; }
+.lightbox-content { width: 90%; max-width: 900px; background: white; border-radius: 2rem; overflow: hidden; position: relative; }
+.close-lightbox { position: absolute; top: 1.5rem; right: 1.5rem; background: rgba(0,0,0,0.5); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+.close-lightbox:hover { background: rgba(0,0,0,0.8); transform: rotate(90deg); }
+.lightbox-img-wrapper { width: 100%; height: 500px; background: #f1f5f9; overflow: hidden; }
+.lightbox-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+.lightbox-footer { padding: 2.5rem; text-align: center; }
+.lightbox-footer h3 { font-size: 1.8rem; color: #0e7490; margin-bottom: 0.5rem; font-family: 'Playfair Display', serif; }
+.lightbox-footer p { color: #64748b; font-size: 1.1rem; }
 
 /* Modal & Form */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 1rem; }
