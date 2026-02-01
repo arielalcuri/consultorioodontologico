@@ -123,14 +123,14 @@ export const deleteUser = (email) => {
 
 // SERVICES STORE
 const defaultServices = [
-    { id: 1, title: 'Estética Dental', description: 'Carillas, coronas y diseño de sonrisa.', icon: 'fas fa-gem', image: 'https://www.instagram.com/p/DEbSFFdsf25/?igsh=YmJ3bjI1dnFqZHd6' },
+    { id: 1, title: 'Estética Dental', description: 'Carillas, coronas de porcelana y diseño de sonrisa.', icon: 'fas fa-gem', image: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?q=80&w=1000&auto=format' },
     { id: 2, title: 'Ortodoncia', description: 'Brackets metálicos, cerámicos y zafiro.', icon: 'fas fa-teeth-open', image: 'https://neuroncdn.com/cdn-0001/7ad87ade3f518397f0d5a5236a18cbba3158cabbf035f5fca872c426744003c7?ts=1727129627' },
-    { id: 3, title: 'Implantes', description: 'Reposición dental con tecnología de punta.', icon: 'fas fa-shapes', image: '' },
-    { id: 4, title: 'Endodoncia', description: 'Tratamiento de conducto avanzado.', icon: 'fas fa-microscope', image: '' },
-    { id: 5, title: 'Prótesis', description: 'Soluciones fijas y removibles para tu dentadura.', icon: 'fas fa-user-md', image: 'https://www.instagram.com/p/DHhDydbB2Gy/?igsh=a3p0YWttanN0cmZy' }
+    { id: 3, title: 'Implantes', description: 'Reposición dental con implantes de alta precisión.', icon: 'fas fa-shapes', image: 'https://plus.unsplash.com/premium_photo-1661301072485-a74534a70617?q=80&w=1000&auto=format' },
+    { id: 4, title: 'Endodoncia', description: 'Tratamiento de conducto avanzado y sin dolor.', icon: 'fas fa-microscope', image: 'https://images.unsplash.com/photo-1504813184591-01592fd039da?q=80&w=1000&auto=format' },
+    { id: 5, title: 'Prótesis', description: 'Soluciones completas y naturales para tu dentadura.', icon: 'fas fa-user-md', image: 'https://images.unsplash.com/photo-1523292562811-8fa7962a78c8?q=80&w=1000&auto=format' }
 ]
 
-const SERVICE_KEY = 'dental_clinic_services_v3'
+const SERVICE_KEY = 'dental_clinic_services_v4'
 const storedServices = localStorage.getItem(SERVICE_KEY)
 export const allServices = ref(storedServices ? JSON.parse(storedServices) : defaultServices)
 
