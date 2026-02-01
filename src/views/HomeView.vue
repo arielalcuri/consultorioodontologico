@@ -52,8 +52,8 @@
             Tu sonrisa merece el cuidado de <span class="highlight-text">Expertos</span>
           </h1>
           <p class="hero-subtitle">
-            Combina tecnología de vanguardia y un trato humano excepcional en Villa Lugano.
-            Resultados naturales que transforman tu bienestar.
+            Brindamos una atención dedicada y un trato humano excepcional en Villa Lugano.
+            Resultados naturales que priorizan tu salud y bienestar.
           </p>
           <div class="hero-buttons">
             <button @click="openBookingModal" class="btn btn-primary btn-lg">Agendar ahora</button>
