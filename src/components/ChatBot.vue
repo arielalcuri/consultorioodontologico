@@ -412,6 +412,126 @@ const handleRegistration = (text) => {
   return { text: response, options: options }
 }
 
+// --- MANEJO DE USUARIO ACTIVO (Turnos, Consultas) ---
+const handleActiveUserFlow = (text, forceAction) => {
+  const state = bookingState.value
+  const user = state.extractedUser
+  const lower = text.toLowerCase()
+  let response = ""
+  let options = []
+
+  // 1. Intención: VER / CANCELAR TURNOS
+  if (forceAction === 'mis_turnos' || lower.includes('mis turnos') || lower.includes('cancelar') || lower.includes('consultar')) {
+     const misTurnos = allTurnos.value.filter(t => t.dni === user.dni)
+     if (misTurnos.length > 0) {
+        state.cancelMode = true
+        state.serviceMode = false
+        state.turnosToList = misTurnos
+        response = `Tienes los siguientes turnos agendados. Si deseas cancelar alguno, escribe su número:<br>`
+        misTurnos.forEach((t, i) => {
+           response += `<br><strong>${i+1}. ${t.type}</strong> - ${formatDateFriendly(t.selectedDate)}`
+        })
+        options = [{ label: '❌ Salir', action: 'cancel_op' }]
+     } else {
+        response = `${user.name}, no tienes turnos pendientes.`
+        options = [{ label: '📅 Nuevo Turno', action: 'turno' }]
+     }
+     return { text: response, options }
+  }
+
+  // 2. Ejecutar Cancelación
+  if (state.cancelMode) {
+      const idx = parseInt(text) - 1
+      if (!isNaN(idx) && state.turnosToList[idx]) {
+          const t = state.turnosToList[idx]
+          deleteTurno(t.id)
+          state.cancelMode = false
+          state.turnosToList = []
+          return { text: `Listo. He cancelado tu turno de ${t.type}.`, options: defaultOptions }
+      } else if (lower.includes('salir') || lower.includes('no')) {
+          state.cancelMode = false
+          state.turnosToList = []
+          return { text: "Entendido. ¿En qué más te ayudo?", options: defaultOptions }
+      }
+  }
+
+  // 3. Intención: NUEVO TURNO (Inicio)
+  if (forceAction === 'turno' || lower.includes('turno') || lower.includes('reservar')) {
+      state.serviceMode = true
+      state.extractedService = null
+      state.extractedDate = null
+      
+      // Generar chips de servicios populares
+      const serviceOptions = allServices.value.slice(0, 4).map(s => ({ label: `🦷 ${s.title}`, action: `svc_${s.title}` }))
+      
+      return { 
+          text: `Claro <strong>${user.name}</strong>. ¿Qué tratamiento necesitas hoy?`, 
+          options: serviceOptions 
+      }
+  }
+
+  // 4. Detección de SERVICIO
+  // Si viene por acción forzada 'svc_Algo' o si estamos en modo servicio y escriben texto
+  let serviceName = null
+  if (forceAction && forceAction.startsWith('svc_')) {
+      serviceName = forceAction.replace('svc_', '')
+  } else if (state.serviceMode || lower.includes('limpieza') || lower.includes('extraccion') || lower.includes('consulta')) {
+      // Intentar extraer del texto
+      const found = extractService(lower)
+      if (found) serviceName = found.title
+  }
+
+  if (serviceName) {
+      const serviceObj = allServices.value.find(s => s.title === serviceName) || { title: serviceName }
+      state.extractedService = serviceObj
+      state.serviceMode = false
+      return { 
+          text: `Bien, agendemos ${serviceObj.title}. 🗓️ ¿Para qué fecha te gustaría? (Recordá: Martes y Jueves)`, 
+          options: [] // Date picker no tenemos en chat, input libre
+      }
+  }
+
+  // 5. Detección de FECHA (Si ya tenemos servicio)
+  if (state.extractedService && !state.extractedDate) {
+      const date = extractDateStr(lower)
+      if (date) {
+          state.extractedDate = date
+          // CONFIRMAR Y GUARDAR
+          addTurno({
+              lastName: user.lastName, firstName: user.name, dni: user.dni, email: user.email, phone: user.phone,
+              type: state.extractedService.title, details: 'Via ChatBot', selectedDate: date
+          })
+          
+          const friendlyDate = formatDateFriendly(date)
+          // Reset
+          const sName = state.extractedService.title
+          state.extractedService = null
+          state.extractedDate = null
+          
+          return { 
+              text: `¡Listo <strong>${user.name}</strong>! ✅<br>Tu turno para <strong>${sName}</strong> quedó confirmado para el <strong>${friendlyDate}</strong>.<br>Te esperamos.`, 
+              options: [{ label: '👋 Gracias, chau', action: 'bye' }] 
+          }
+      } else {
+          // Si escribieron algo que no es fecha pero estabamos esperando fecha...
+          // Aferrarse al contexto un poco más o dar ayuda
+           return { text: "Por favor indicame una fecha válida (ej: '14 de Septiembre' o 'el martes 20'). Atendemos Martes y Jueves.", options: [] }
+      }
+  }
+
+  // Fallback para usuario activo (Chat general)
+  if (lower.includes('chau') || lower.includes('gracias')) {
+      return { text: "¡De nada! Nos vemos en el consultorio. 👋", options: [] }
+  }
+  
+  // Si escribe su propio DNI de nuevo
+  if (extractDni(lower) === user.dni) {
+      return { text: "Sí, ya te tengo identificado en el sistema. ¿Querés sacar un turno?", options: [{ label: '📅 Sí, Reservar', action: 'turno' }] }
+  }
+
+  return processIntent(text, forceAction)
+}
+
 const sendMessage = (e, forceAction = null) => {
   const text = userInput.value.trim()
   if (!text && !forceAction) return
@@ -421,48 +541,57 @@ const sendMessage = (e, forceAction = null) => {
     messages.value.push({ role: 'user', text: text, time: getTime() })
   }
   userInput.value = ''
-  currentOptions.value = [] // Ocultar opciones
+  currentOptions.value = [] 
   isTyping.value = true
   scrollToBottom()
 
   setTimeout(() => {
     let result = { text: "", options: [] }
 
-    // --- MODO REGISTRO ---
+    // 1. MODO REGISTRO (Prioridad Alta)
     if (bookingState.value.registrationMode) {
-      // Si es una acción forzada (click en boton confirmación), pasamos eso, sino el texto
       const input = forceAction || text
       result = handleRegistration(input)
     } 
+    // 2. USUARIO ACTIVO (Logged in)
+    else if (bookingState.value.active) {
+       result = handleActiveUserFlow(text, forceAction)
+    }
+    // 3. VISITANTE (Detectar DNI o Intención General)
     else {
-      // --- FLUJO NORMAL ---
       const lower = text.toLowerCase()
-      
-      // Chequear DNI solo si no estamos en medio de otra cosa
       const dni = extractDni(lower)
       
-      if (dni && !bookingState.value.active) {
+      if (dni) {
+          // Intentar Login
           const user = findUserByDetails(dni, lower)
           if (user) {
               bookingState.value.extractedUser = user
               bookingState.value.active = true
-              result = { text: `¡Hola de nuevo <strong>${user.name}</strong>! Te he identificado. ¿Qué deseas hacer hoy?`, options: defaultOptions }
+              result = { 
+                  text: `¡Hola de nuevo <strong>${user.name}</strong>! Te encontré en el sistema. 👋<br>¿En qué puedo ayudarte hoy?`, 
+                  options: defaultOptions 
+              }
           } else {
-              // INICIAR REGISTRO SI NO EXISTE
+              // Iniciar Registro
               bookingState.value.registrationMode = true
               bookingState.value.regStep = 0
               bookingState.value.tempUser = { dni: dni } 
               bookingState.value.startActionAfterReg = forceAction 
-              result = { text: `No encuentro el DNI <strong>${dni}</strong> en mi sistema. 😕<br><br>¡Pero no hay problema! Vamos a registrarte rápidamente.<br>Por favor, indicame tu <strong>Nombre</strong>:`, options: [] }
+              result = { 
+                  text: `No encuentro el DNI <strong>${dni}</strong> en mi sistema. 😕<br><br>¡Pero no hay problema! Vamos a registrarte rápidamente.<br>Por favor, indicame tu <strong>Nombre</strong>:`, 
+                  options: [] 
+              }
           }
       } else {
+          // Procesamiento NLP normal
           result = processIntent(text, forceAction)
       }
     }
     
     messages.value.push({ role: 'bot', text: result.text, time: getTime() })
     isTyping.value = false
-    currentOptions.value = result.options || [] // Ensure array
+    currentOptions.value = result.options || [] 
     nextTick(scrollToBottom)
   }, 1200)
 }
