@@ -468,8 +468,8 @@ const submitBooking = async () => {
 .lightbox-content { width: 90%; max-width: 900px; background: white; border-radius: 2rem; overflow: hidden; position: relative; }
 .close-lightbox { position: absolute; top: 1.5rem; right: 1.5rem; background: rgba(0,0,0,0.5); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
 .close-lightbox:hover { background: rgba(0,0,0,0.8); transform: rotate(90deg); }
-.lightbox-img-wrapper { width: 100%; height: 500px; background: #f1f5f9; overflow: hidden; }
-.lightbox-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+.lightbox-img-wrapper { width: 100%; height: auto; max-height: 70vh; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.lightbox-img-wrapper img { max-width: 100%; max-height: 70vh; object-fit: contain; }
 .lightbox-footer { padding: 2.5rem; text-align: center; }
 .lightbox-footer h3 { font-size: 1.8rem; color: #0e7490; margin-bottom: 0.5rem; font-family: 'Playfair Display', serif; }
 .lightbox-footer p { color: #64748b; font-size: 1.1rem; }
