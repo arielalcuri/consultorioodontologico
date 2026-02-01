@@ -51,9 +51,7 @@
       <div class="hero-shape"></div>
       <div class="container hero-content">
         <div class="hero-text fade-in">
-          <div class="badge-premium">
-            <i class="fas fa-award"></i> Excelencia en Odontología
-          </div>
+
           <h1 class="hero-title">
             Tu sonrisa merece el cuidado de <span class="highlight-text">Expertos</span>
           </h1>
@@ -421,13 +419,11 @@ const submitBooking = async () => {
 .highlight-text::after { content: ''; position: absolute; bottom: 5px; left: 0; width: 100%; height: 10px; background: rgba(34, 211, 238, 0.2); z-index: -1; }
 
 /* Navbar */
-.navbar { position: fixed; top: 0; width: 100%; padding: 1rem 0; transition: 0.4s; z-index: 1000; background: rgba(255,255,255,0.98); backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-.navbar.scrolled { padding: 0.8rem 0; }
-.nav-container { display: flex; justify-content: space-between; align-items: center; }
-.logo { text-decoration: none; display: flex; align-items: center; gap: 0.8rem; }
-.logo-icon { font-size: 2rem; color: #0e7490; }
-.brand { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: #0e7490; line-height: 1; display: block; }
-.sub-brand { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+.navbar { position: fixed; top: 0; left: 0; width: 100%; height: 80px; padding: 0.5rem 0; transition: 0.4s; z-index: 1200; background: rgba(255,255,255,0.98); backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.05); display: flex; align-items: center; }
+.navbar.scrolled { height: 70px; }
+.nav-container { display: flex; justify-content: space-between; align-items: center; width: 100%; position: relative; }
+.logo { text-decoration: none; display: flex; align-items: center; gap: 0.8rem; z-index: 1300; }
+.nav-actions { display: flex; align-items: center; gap: 1rem; z-index: 1300; }
 .nav-links { display: flex; gap: 2.5rem; }
 .nav-link { text-decoration: none; color: #1e293b; font-weight: 600; font-size: 0.95rem; transition: 0.3s; }
 .nav-link:hover { color: #0e7490; }
@@ -557,8 +553,10 @@ input::placeholder, textarea::placeholder { color: #94a3b8; }
 @media (max-width: 992px) {
   .nav-links { display: none; }
   .mobile-menu-btn { display: flex; }
+  .navbar { padding: 0.5rem 0; }
   .hero-content { grid-template-columns: 1fr; text-align: center; }
-  .hero-title { font-size: 3rem; }
+  .hero-title { font-size: 2.5rem; }
+}
   .hero-subtitle { margin: 0 auto 3rem; }
   .hero-buttons { justify-content: center; }
   .hero-image-wrapper { display: none; }
