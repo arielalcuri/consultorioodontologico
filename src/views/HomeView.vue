@@ -94,7 +94,7 @@
       <div class="container split-grid">
         <div class="image-side">
           <div class="exp-badge shadow-pulse">
-            <span class="num">20+</span>
+            <span class="num">30+</span>
             <span class="txt">Años de <br>Trayectoria <br><strong>Profesional</strong></span>
           </div>
           <img :src="siteConfig.aboutImage" alt="Profesional" class="about-img">
