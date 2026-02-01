@@ -101,11 +101,10 @@
         </div>
         <div class="text-side">
           <span class="tag">Sobre Nosotros</span>
-          <h2 class="section-title">Ciencia y <span class="highlight-text">Cercanía</span></h2>
+          <h2 class="section-title"><span class="highlight-text">Cercanía</span></h2>
           <p class="about-p">En el Centro Odontológico Integral, brindamos una atención personalizada enfocada en la salud de cada paciente.</p>
           <ul class="feature-checks">
             <li><i class="fas fa-check-circle"></i> Atención especial Martes y Jueves</li>
-            <li><i class="fas fa-check-circle"></i> Equipamiento de última generación</li>
             <li><i class="fas fa-check-circle"></i> Ubicación privilegiada en Villa Lugano</li>
           </ul>
         </div>
