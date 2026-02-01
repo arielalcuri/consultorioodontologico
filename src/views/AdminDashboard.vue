@@ -475,7 +475,7 @@ const isEditingService = ref(false)
 
 const tabs = [
   { id: 'solicitudes', name: 'Solicitudes', icon: 'fas fa-bell' },
-  { id: 'agenda', name: 'Calendario / Agenda', icon: 'fas fa-calendar-alt' },
+  { id: 'agenda', name: 'Agenda Médica', icon: 'fas fa-calendar-alt' },
   { id: 'usuarios', name: 'Pacientes', icon: 'fas fa-users' },
   { id: 'servicios', name: 'Servicios', icon: 'fas fa-concierge-bell' },
   { id: 'chatbot', name: 'ChatBot AI', icon: 'fas fa-robot' }
