@@ -175,9 +175,12 @@
     <footer id="contacto" class="footer">
       <div class="container footer-grid">
         <div class="footer-info">
-          <div class="logo-text">
-            <span class="brand" style="color: white !important; font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; display: block;">Centro Odontológico Integral</span>
-            <span class="sub-brand" style="color: #cbd5e1 !important; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; display: block; margin-top: 5px;">Dra. Adriana Pagnotta</span>
+          <div class="footer-brand-wrapper" style="display: flex; align-items: center; gap: 1rem;">
+            <i class="fas fa-tooth" style="font-size: 2.5rem; color: #22d3ee;"></i>
+            <div class="logo-text">
+               <span class="brand" style="color: white !important; font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; display: block;">Centro Odontológico Integral</span>
+               <span class="sub-brand" style="color: #cbd5e1 !important; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; display: block; margin-top: 5px;">Dra. Adriana Pagnotta</span>
+            </div>
           </div>
           <p class="mt-4">Liderando la salud dental en Villa Lugano con profesionalismo y calidez.</p>
         </div>
