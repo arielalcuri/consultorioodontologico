@@ -161,7 +161,7 @@ const defaultKnowledge = {
     defaultResponse: 'He analizado tu consulta pero para brindarte una asesoría exacta y profesional, te sugerimos conversar con nuestra secretaria al 📞 4601-8957 o por WhatsApp al 11 3001-9567.',
     appointmentInfo: 'Con mucho gusto te oriento. Para reservar una cita tienes dos opciones:<br>1. Presionar el botón <strong>Reservar Cita</strong> en la cabecera.<br>2. Ingresar a tu <strong>Portal de Pacientes</strong>.<br><br>Recuerda que atendemos Martes y Jueves de 15:30 a 20:00hs.',
     contactInfo: 'Para una atención personalizada, puedes contactar a nuestra secretaria a través de:<br>📞 Fijo: 4601-8957<br>📱 WhatsApp: 11 3001-9567',
-    insuranceInfo: 'Actualmente trabajamos con las siguientes obras sociales: OSDE, Swiss Medical, Galeno y Medicus. Para otras coberturas, por favor consúltanos directamente.',
+    insuranceInfo: '',
     faqs: []
 }
 

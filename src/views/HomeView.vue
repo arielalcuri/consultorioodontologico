@@ -133,22 +133,10 @@
       <div class="container">
         <div class="section-header text-center">
           <span class="tag">Opiniones Reales</span>
-          <h2 class="section-title">Pacientes <span class="highlight-text">Felices</span></h2>
+          <h2 class="section-title">Lo que dicen nuestros <span class="highlight-text">Pacientes</span></h2>
         </div>
-        <div class="testimonials-grid mt-12">
-          <div v-for="review in siteConfig.reviews" :key="review.id" class="review-card">
-            <div class="stars">
-              <i v-for="n in review.stars" :key="n" class="fas fa-star"></i>
-            </div>
-            <p class="review-text">"{{ review.text }}"</p>
-            <div class="review-author">
-              <div class="author-avatar">{{ review.name.charAt(0) }}</div>
-              <div class="author-info">
-                <h4>{{ review.name }}</h4>
-                <span>{{ review.date }} en Google</span>
-              </div>
-            </div>
-          </div>
+        <div class="testimonials-widget mt-12">
+          <iframe src='https://widgets.sociablekit.com/google-reviews/iframe/25649984' frameborder='0' width='100%' height='600'></iframe>
         </div>
       </div>
     </section>
