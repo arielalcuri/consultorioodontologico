@@ -176,8 +176,8 @@
       <div class="container footer-grid">
         <div class="footer-info">
           <div class="logo-text">
-            <span class="brand white">Centro Odontológico Integral</span>
-            <span class="sub-brand">Dra. Adriana Pagnotta</span>
+            <span class="brand" style="color: white !important; font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; display: block;">Centro Odontológico Integral</span>
+            <span class="sub-brand" style="color: #cbd5e1 !important; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; display: block; margin-top: 5px;">Dra. Adriana Pagnotta</span>
           </div>
           <p class="mt-4">Liderando la salud dental en Villa Lugano con profesionalismo y calidez.</p>
         </div>
@@ -518,8 +518,9 @@ input::placeholder, textarea::placeholder { color: #94a3b8; }
 
 /* Footer */
 .footer { background: #0f172a; color: white; padding: 5rem 0 2rem; }
-.footer .brand { color: white !important; font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; line-height: 1.1; display: block; }
-.footer .sub-brand { color: #94a3b8 !important; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; display: block; margin-top: 5px; }
+/* Footer Branding Force */
+footer .logo-text .brand { color: white !important; }
+footer .logo-text .sub-brand { color: #cbd5e1 !important; }
 .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 4rem; }
 .white { color: white !important; }
 .footer-contact h4 { margin-bottom: 2rem; color: #22d3ee; }
