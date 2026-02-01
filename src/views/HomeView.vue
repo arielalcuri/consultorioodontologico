@@ -36,11 +36,10 @@
     <div class="mobile-menu" :class="{ 'active': menuOpen }">
       <button class="close-menu-btn" @click="toggleMenu">&times;</button>
       <div class="mobile-links">
-        <a href="#inicio" @click="mobileMenuOpen = false">Inicio</a>
-        <a href="#servicios" @click="mobileMenuOpen = false">Tratamientos</a>
-        <a href="#nosotros" @click="mobileMenuOpen = false">Nosotros</a>
-        <router-link to="/pacientes" @click="mobileMenuOpen = false">Portal Pacientes</router-link>
-        <router-link to="/login" @click="mobileMenuOpen = false" class="admin-link">Acceso Profesional</router-link>
+        <a href="#inicio" @click="toggleMenu">Inicio</a>
+        <a href="#servicios" @click="toggleMenu">Tratamientos</a>
+        <a href="#contacto" @click="toggleMenu">Contacto</a>
+        <router-link to="/admin" class="admin-link text-center mt-4" @click="toggleMenu">Administración</router-link>
         <button @click="openBookingModal" class="btn btn-primary mt-4">Reservar Cita</button>
       </div>
     </div>
@@ -420,8 +419,8 @@ const submitBooking = async () => {
 .highlight-text::after { content: ''; position: absolute; bottom: 5px; left: 0; width: 100%; height: 10px; background: rgba(34, 211, 238, 0.2); z-index: -1; }
 
 /* Navbar */
-.navbar { position: fixed; top: 0; width: 100%; padding: 1.5rem 0; transition: 0.4s; z-index: 1000; }
-.navbar.scrolled { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 0.8rem 0; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+.navbar { position: fixed; top: 0; width: 100%; padding: 1rem 0; transition: 0.4s; z-index: 1000; background: rgba(255,255,255,0.98); backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+.navbar.scrolled { padding: 0.8rem 0; }
 .nav-container { display: flex; justify-content: space-between; align-items: center; }
 .logo { text-decoration: none; display: flex; align-items: center; gap: 0.8rem; }
 .logo-icon { font-size: 2rem; color: #0e7490; }
