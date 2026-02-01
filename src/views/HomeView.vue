@@ -160,7 +160,7 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p>&copy; 2026 Centro Odontológico Integral. Todos los derechos reservados.</p>
+        <p>&copy; 2026 Centro Odontológico Integral Dra. Adriana Pagnotta. Todos los derechos reservados.</p>
       </div>
     </footer>
 
