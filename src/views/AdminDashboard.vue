@@ -87,8 +87,13 @@
                  :class="{ 'has-turns': getTurnsForDay(day).length > 0, 'selected': selectedDay === day, 'past-day': isPastDay(day) }"
                  @click="selectDay(day)">
               <span class="day-num">{{ day }}</span>
-              <div v-if="getTurnsForDay(day).length > 0" class="turn-indicator">
-                {{ getTurnsForDay(day).length }} {{ getTurnsForDay(day).length === 1 ? 'turno' : 'turnos' }}
+              <div class="indicators-wrapper">
+                <div v-if="getTurnStats(day).orto > 0" class="turn-indicator orto">
+                  {{ getTurnStats(day).orto }} Ortodoncia
+                </div>
+                <div v-if="getTurnStats(day).gral > 0" class="turn-indicator gral">
+                  {{ getTurnStats(day).gral }} Gral
+                </div>
               </div>
             </div>
           </div>
@@ -115,7 +120,7 @@
                 <tr v-for="turno in getTurnsForDay(selectedDay)" :key="turno.id">
                   <td><strong>{{ turno.assignedTime }}hs</strong></td>
                   <td>{{ turno.lastName }}, {{ turno.firstName }}</td>
-                  <td><span class="badge-specialty">{{ turno.type }}</span></td>
+                  <td><span class="badge-specialty" :class="isOrto(turno.type) ? 'orto' : 'gral'">{{ turno.type }}</span></td>
                   <td>
                     <a :href="'https://wa.me/549' + turno.phone?.replace(/\D/g,'')" target="_blank" class="wa-link">
                       <i class="fab fa-whatsapp"></i> WhatsApp
@@ -495,6 +500,18 @@ const getTurnsForDay = (day) => {
   return confirmedTurnos.value.filter(t => t.selectedDate === dateStr)
 }
 
+const getTurnStats = (day) => {
+  const turns = getTurnsForDay(day)
+  let orto = 0
+  let gral = 0
+  turns.forEach(t => {
+    if (t.type.toLowerCase().includes('ortodoncia')) orto++
+    else gral++
+  })
+  return { orto, gral }
+}
+const isOrto = (type) => type?.toLowerCase().includes('ortodoncia')
+
 const selectDay = (day) => {
   selectedDay.value = day
 }
@@ -590,7 +607,15 @@ td { padding: 1rem; border-top: 1px solid #f1f5f9; }
 .day-cell.past-day { opacity: 0.5; background: #f1f5f9; }
 .day-cell.has-turns { background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 .day-num { font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; }
-.turn-indicator { font-size: 0.75rem; background: #0e7490; color: white; padding: 0.2rem 0.5rem; border-radius: 20px; text-align: center; font-weight: 600; }
+.day-num { font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; }
+.indicators-wrapper { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+.turn-indicator { font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 6px; text-align: center; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.turn-indicator.orto { background: #8b5cf6; } /* Violeta para Ortodoncia */
+.turn-indicator.gral { background: #0ea5e9; } /* Azul para General */
+
+.badge-specialty { padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; color: white; background: #64748b; }
+.badge-specialty.orto { background: #8b5cf6; }
+.badge-specialty.gral { background: #0ea5e9; }
 
 .day-details { background: white; padding: 2rem; border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
 .details-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
