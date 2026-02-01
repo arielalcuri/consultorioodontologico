@@ -87,7 +87,7 @@
                  :class="{ 'has-turns': getTurnsForDay(day).length > 0, 'selected': selectedDay === day, 'past-day': isPastDay(day) }"
                  @click="selectDay(day)">
               <span class="day-num">{{ day }}</span>
-              <div class="indicators-wrapper">
+              <div v-if="getTurnsForDay(day).length > 0" class="indicators-wrapper">
                 <div v-if="getTurnStats(day).orto > 0" class="turn-indicator orto">
                   {{ getTurnStats(day).orto }} Ortodoncia
                 </div>
@@ -393,9 +393,9 @@
               <div class="form-group"><label>DNI</label><input v-model="newUserForm.dni" required></div>
               <div class="form-group"><label>Teléfono</label><input v-model="newUserForm.phone" required></div>
             </div>
-            <div class="form-group"><label>Email</label><input v-model="newUserForm.email" type="email" required></div>
+            <div class="form-group"><label>Email</label><input v-model="newUserForm.email" type="email" required autocomplete="email"></div>
             <div class="form-group"><label>Fecha Nacimiento</label><input v-model="newUserForm.birthDate" type="date"></div>
-            <div class="form-group"><label>Contraseña Acceso</label><input v-model="newUserForm.password" type="text" placeholder="Clave para el portal"></div>
+            <div class="form-group"><label>Contraseña Acceso</label><input v-model="newUserForm.password" type="password" placeholder="Clave para el portal" autocomplete="current-password"></div>
             <button type="submit" class="btn btn-primary btn-full">Registrar Paciente</button>
          </form>
        </div>
