@@ -29,18 +29,18 @@
       </div>
     </nav>
 
-    <!-- Mobile Menu Overlay -->
-    <div v-if="menuOpen" class="mobile-menu-overlay fade-in" @click="toggleMenu"></div>
+    <!-- Mobile Menu Overlay (Click Outside to Close) -->
+    <div v-show="menuOpen" class="mobile-menu-overlay fade-in" @click="menuOpen = false"></div>
 
-    <!-- Mobile Menu -->
+    <!-- Mobile Menu Panel -->
     <div class="mobile-menu" :class="{ 'active': menuOpen }">
-      <button class="close-menu-btn" @click="toggleMenu">&times;</button>
+      <button class="close-menu-btn" @click="menuOpen = false">&times;</button>
       <div class="mobile-links">
-        <a href="#inicio" @click="toggleMenu">Inicio</a>
-        <a href="#servicios" @click="toggleMenu">Tratamientos</a>
-        <a href="#contacto" @click="toggleMenu">Contacto</a>
-        <router-link to="/admin" class="admin-link text-center mt-4" @click="toggleMenu">Administración</router-link>
-        <button @click="openBookingModal" class="btn btn-primary mt-4">Reservar Cita</button>
+        <a href="#inicio" @click="menuOpen = false">Inicio</a>
+        <a href="#servicios" @click="menuOpen = false">Tratamientos</a>
+        <a href="#contacto" @click="menuOpen = false">Contacto</a>
+        <router-link to="/admin" class="admin-link text-center mt-4" @click="menuOpen = false">Administración</router-link>
+        <button @click="{ openBookingModal(); menuOpen = false }" class="btn btn-primary mt-4">Reservar Cita</button>
       </div>
     </div>
 
