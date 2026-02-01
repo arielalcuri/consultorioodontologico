@@ -93,19 +93,19 @@
     <section id="nosotros" class="section">
       <div class="container split-grid">
         <div class="image-side">
-          <div class="exp-badge">
+          <div class="exp-badge shadow-pulse">
             <span class="num">20+</span>
-            <span class="txt">Años de <br>Trayectoria</span>
+            <span class="txt">Años de <br>Trayectoria <br><strong>Profesional</strong></span>
           </div>
           <img :src="siteConfig.aboutImage" alt="Profesional" class="about-img">
         </div>
         <div class="text-side">
           <span class="tag">Sobre Nosotros</span>
           <h2 class="section-title"><span class="highlight-text">Cercanía</span></h2>
-          <p class="about-p">En el Centro Odontológico Integral, brindamos una atención personalizada enfocada en la salud de cada paciente.</p>
+          <p class="about-p">En el Centro Odontológico Integral, brindamos una atención personalizada enfocada en la salud y el bienestar integral de cada paciente.</p>
           <ul class="feature-checks">
-            <li><i class="fas fa-check-circle"></i> Atención especial Martes y Jueves</li>
-            <li><i class="fas fa-check-circle"></i> Ubicación privilegiada en Villa Lugano</li>
+            <li><i class="fas fa-check-circle"></i> <span>Atención dedicada Martes y Jueves</span></li>
+            <li><i class="fas fa-check-circle"></i> <span>Ubicación privilegiada en Villa Lugano</span></li>
           </ul>
         </div>
       </div>
@@ -405,6 +405,30 @@ const submitBooking = async () => {
 .main-hero-img { width: 100%; border-radius: 3rem; box-shadow: 30px 30px 0 #0e749010; transition: 0.5s; }
 .glass-float { position: absolute; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); padding: 1rem 1.5rem; border-radius: 1.5rem; display: flex; align-items: center; gap: 0.8rem; box-shadow: 0 20px 40px rgba(0,0,0,0.1); font-weight: 700; color: #1e293b; z-index: 20; }
 .top-right { top: 10%; right: -20px; }
+
+/* About Section */
+.split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center; }
+.image-side { position: relative; }
+.about-img { width: 100%; border-radius: 2.5rem; box-shadow: 20px 20px 60px rgba(0,0,0,0.1); border: 8px solid white; transition: 0.5s; }
+.about-img:hover { transform: scale(1.02); }
+
+.exp-badge { 
+  position: absolute; bottom: -30px; left: -30px; 
+  background: linear-gradient(135deg, #0e7490, #22d3ee); 
+  color: white; padding: 2rem; border-radius: 2rem; 
+  display: flex; align-items: center; gap: 1.2rem; 
+  box-shadow: 0 20px 40px rgba(14, 116, 144, 0.4); z-index: 10;
+  border: 4px solid white;
+}
+.exp-badge .num { font-size: 3rem; font-weight: 800; line-height: 1; font-family: 'Playfair Display', serif; }
+.exp-badge .txt { font-size: 0.85rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; line-height: 1.4; opacity: 0.9; }
+.exp-badge .txt strong { display: block; font-size: 1rem; color: #fff; margin-top: 2px; }
+
+.text-side { padding-left: 2rem; }
+.about-p { font-size: 1.15rem; color: #475569; margin-bottom: 2.5rem; line-height: 1.8; }
+.feature-checks { list-style: none; display: flex; flex-direction: column; gap: 1.2rem; }
+.feature-checks li { display: flex; align-items: center; gap: 1rem; font-weight: 600; color: #1e293b; font-size: 1.05rem; }
+.feature-checks li i { color: #0e7490; font-size: 1.4rem; filter: drop-shadow(0 4px 6px rgba(14, 116, 144, 0.2)); }
 
 /* Service Cards Modern */
 .bg-light { background: #f1f5f9; }
