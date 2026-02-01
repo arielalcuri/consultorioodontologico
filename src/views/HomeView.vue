@@ -518,6 +518,8 @@ input::placeholder, textarea::placeholder { color: #94a3b8; }
 
 /* Footer */
 .footer { background: #0f172a; color: white; padding: 5rem 0 2rem; }
+.footer .brand { color: white !important; font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; line-height: 1.1; display: block; }
+.footer .sub-brand { color: #94a3b8 !important; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; display: block; margin-top: 5px; }
 .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 4rem; }
 .white { color: white !important; }
 .footer-contact h4 { margin-bottom: 2rem; color: #22d3ee; }
