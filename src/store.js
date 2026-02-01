@@ -185,7 +185,7 @@ export const updateBotKnowledge = (newData) => {
 }
 
 // --- SITE CONFIG STORE (Images & FAQs) ---
-const SITE_CONFIG_KEY = 'dental_clinic_site_config_v2'
+const SITE_CONFIG_KEY = 'dental_clinic_site_config_v6'
 const defaultSiteConfig = {
     heroImage: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1000&auto=format&fit=crop',
     aboutImage: 'https://estudidentalbarcelona.com/wp-content/uploads/2017/08/tomografia-dientes.jpg',
@@ -193,6 +193,11 @@ const defaultSiteConfig = {
         { id: 1, q: '¿Aceptan obras sociales?', a: 'No, no trabajamos con obras sociales/prepagas. En caso de necesitar reintegro, realizamos la factura y la orden con el diagnóstico para que puedas solicitar el reintegro.' },
         { id: 2, q: '¿Tienen estacionamiento?', a: 'Hay estacionamiento libre sobre la calle Cosquín y alrededores.' },
         { id: 3, q: '¿Atienden urgencias?', a: 'Atendemos urgencias dentro de nuestro horario de atención (Martes y Jueves). En caso que necesites una atención inmediata, te solicitamos que te pongas en contacto con nosotros a los teléfonos: 4601-8957 o al 11 3001-9567.' }
+    ],
+    reviews: [
+        { id: 1, name: 'Valeria M.', stars: 5, text: 'Excelente atención de la Dra. Pagnotta. Me realizó un tratamiento de conducto sin dolor y con mucha paciencia. ¡Super recomendable!', date: 'Hace 2 meses' },
+        { id: 2, name: 'Carlos R.', stars: 5, text: 'El consultorio es impecable y la atención muy puntual. Me explicaron todo el procedimiento de mis implantes con claridad. Gracias.', date: 'Hace 5 meses' },
+        { id: 3, name: 'Mariana S.', stars: 5, text: 'Llevo a mis hijos hace años y siempre nos reciben con una sonrisa. Gran profesional y excelente ser humano.', date: 'Hace 1 año' }
     ]
 }
 

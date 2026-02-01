@@ -128,6 +128,31 @@
       </div>
     </section>
 
+    <!-- Testimonials Section -->
+    <section id="testimonios" class="section">
+      <div class="container">
+        <div class="section-header text-center">
+          <span class="tag">Opiniones Reales</span>
+          <h2 class="section-title">Pacientes <span class="highlight-text">Felices</span></h2>
+        </div>
+        <div class="testimonials-grid mt-12">
+          <div v-for="review in siteConfig.reviews" :key="review.id" class="review-card">
+            <div class="stars">
+              <i v-for="n in review.stars" :key="n" class="fas fa-star"></i>
+            </div>
+            <p class="review-text">"{{ review.text }}"</p>
+            <div class="review-author">
+              <div class="author-avatar">{{ review.name.charAt(0) }}</div>
+              <div class="author-info">
+                <h4>{{ review.name }}</h4>
+                <span>{{ review.date }} en Google</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- FAQ Section -->
     <section id="faq" class="section bg-light">
       <div class="container max-w-2xl">
@@ -549,4 +574,19 @@ input::placeholder, textarea::placeholder { color: #94a3b8; }
 .faq-question i { color: #0e7490; font-size: 0.9rem; }
 .faq-answer { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(14, 116, 144, 0.1); animation: fadeIn 0.4s ease-out; }
 .faq-answer p { color: #64748b; line-height: 1.7; margin: 0; }
+
+/* Testimonials Styles */
+.testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+.review-card { background: white; padding: 2.5rem; border-radius: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(14, 116, 144, 0.1); transition: 0.3s; position: relative; overflow: hidden; }
+.review-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.08); }
+.stars { color: #f59e0b; margin-bottom: 1rem; font-size: 0.9rem; }
+.review-text { font-size: 1.05rem; font-style: italic; color: #334155; margin-bottom: 2rem; line-height: 1.6; }
+.review-author { display: flex; align-items: center; gap: 1rem; margin-top: auto; }
+.author-avatar { width: 45px; height: 45px; background: #0e7490; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; }
+.author-info h4 { margin: 0; font-size: 0.95rem; color: #0f172a; font-weight: 700; }
+.author-info span { font-size: 0.8rem; color: #64748b; }
+
+@media (max-width: 768px) {
+  .testimonials-grid { grid-template-columns: 1fr; }
+}
 </style>
