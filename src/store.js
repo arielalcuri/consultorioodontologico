@@ -185,7 +185,7 @@ export const updateBotKnowledge = (newData) => {
 }
 
 // --- SITE CONFIG STORE (Images & FAQs) ---
-const SITE_CONFIG_KEY = 'dental_clinic_site_config_v1'
+const SITE_CONFIG_KEY = 'dental_clinic_site_config_v2'
 const defaultSiteConfig = {
     heroImage: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1000&auto=format&fit=crop',
     aboutImage: 'https://estudidentalbarcelona.com/wp-content/uploads/2017/08/tomografia-dientes.jpg',
