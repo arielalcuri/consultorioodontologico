@@ -35,7 +35,7 @@
     <!-- Mobile Menu Panel -->
     <div class="mobile-menu" :class="{ 'active': menuOpen }">
       <button class="close-menu-btn" @click="menuOpen = false">
-        <i class="fas fa-times"></i>
+        ✕
       </button>
       <div class="mobile-links">
         <a href="#inicio" @click="menuOpen = false">Inicio</a>
@@ -533,20 +533,20 @@ input::placeholder, textarea::placeholder { color: #94a3b8; }
 .mobile-menu-btn { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 0.5rem; }
 .mobile-menu-btn span { width: 25px; height: 3px; background: #0e7490; border-radius: 3px; transition: 0.3s; }
 
-.mobile-menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); z-index: 1400; backdrop-filter: blur(5px); }
+.mobile-menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); z-index: 2000; backdrop-filter: blur(5px); }
 .mobile-menu { 
   position: fixed; top: 0; right: -100%; width: 85%; max-width: 350px; height: 100vh; 
-  background: white; z-index: 1500; transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s; padding: 6rem 2rem;
+  background: white; z-index: 2100; transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s; padding: 6rem 2rem;
   box-shadow: -10px 0 30px rgba(0,0,0,0.2);
 }
 .mobile-menu.active { right: 0; }
 .close-menu-btn { 
   position: absolute; top: 1.5rem; right: 1.5rem; 
   background: #f1f5f9; border: 2px solid #e2e8f0; 
-  font-size: 1.5rem; color: #0e7490; 
+  font-size: 1.8rem; color: #0e7490; font-family: sans-serif; font-weight: bold;
   width: 50px; height: 50px; border-radius: 50%; 
   display: flex !important; align-items: center; justify-content: center; 
-  cursor: pointer; z-index: 2000; box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+  cursor: pointer; z-index: 2200; box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
 }
 .close-menu-btn:hover { background: #e2e8f0; transform: rotate(90deg); }
 .mobile-links { display: flex; flex-direction: column; gap: 2rem; }
