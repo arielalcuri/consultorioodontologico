@@ -83,6 +83,40 @@
 
 <script setup>
 import { ref, onMounted, nextTick, watch } from 'vue'
+import { allServices, botKnowledge, findUserByDetails, addTurno, allTurnos, deleteTurno, registerUser } from '../store'
+
+const isOpen = ref(false)
+const userInput = ref('')
+const isTyping = ref(false)
+const messageContainer = ref(null)
+const inputField = ref(null)
+const showBadge = ref(true)
+
+// Opciones rápidas (Chips)
+const currentOptions = ref([])
+
+const defaultOptions = [
+  { label: '📅 Reservar Turno', action: 'turno' },
+  { label: '🦷 Tratamientos', action: 'servicios' },
+  { label: '📍 Ubicación', action: 'ubicacion' },
+  { label: '📞 Contacto', action: 'contacto' }
+]
+
+const getTime = () => {
+  const now = new Date()
+  return now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0')
+}
+
+onMounted(() => {
+  currentOptions.value = defaultOptions
+  setTimeout(() => showBadge.value = false, 5000)
+})
+
+const handleOptionClick = (opt) => {
+  userInput.value = opt.label // Simular escritura
+  sendMessage(null, opt.action)
+}
+
 const bookingState = ref({
   active: false,
   extractedUser: null,
