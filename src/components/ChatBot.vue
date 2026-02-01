@@ -233,6 +233,74 @@ const intents = [
   }
 ]
 
+// --- LOGICA DE PROCESAMIENTO ---
+const processIntent = (input, forceAction = null) => {
+  const lower = input.toLowerCase()
+  let response = ""
+  let nextOpts = defaultOptions 
+
+  // Si hay una acción forzada por botón
+  if (forceAction === 'turno') {
+    response = "Para reservar, puedes usar nuestro botón 'Reservar Cita' o indicarme tu DNI para verificar disponibilidad."
+    nextOpts = [{ label: '📝 Ver mis turnos', action: 'mis_turnos' }]
+  } 
+  else if (forceAction === 'servicios') {
+    const list = allServices.value.map(s => `• ${s.title}`).join('<br>')
+    response = `Realizamos los siguientes tratamientos especializados:<br><br>${list}<br><br>¿Te interesa alguno en particular?`
+  }
+  else if (forceAction === 'ubicacion') {
+    response = "Estamos ubicados en <strong>Cosquín 4809</strong>, Villa Lugano, CABA. <br>📍 <a href='https://maps.google.com' target='_blank' style='color:#0e7490;text-decoration:underline'>Ver en Mapa</a>"
+  }
+  else if (forceAction === 'contacto') {
+    response = "📞 Teléfono fijo: <strong>4601-8957</strong><br>📱 WhatsApp: <strong>11 3001-9567</strong><br>⏰ Horarios: Mar y Jue de 15:30 a 20:00hs."
+    nextOpts = [{ label: '💬 Ir a WhatsApp', action: 'whatsapp_link' }]
+  }
+  else if (forceAction === 'whatsapp_link') {
+    window.open('https://wa.me/5491130019567', '_blank')
+    response = "Te he abierto el chat de WhatsApp en otra pestaña. ¡Gracías!"
+  }
+  // Procesamiento de Texto Libre
+  else if (lower.includes('hola') || lower.includes('buen')) {
+    response = "¡Hola! ¿Cómo estás? ¿En qué puedo ayudarte hoy?"
+  }
+  else if (lower.includes('precio') || lower.includes('costo') || lower.includes('valor')) {
+    response = "Cada sonrisa es única. Para darte un presupuesto exacto, la Dra. Adriana necesita evaluarte. La consulta inicial es fundamental."
+    nextOpts = [{ label: '📅 Agendar Evaluación', action: 'turno' }]
+  }
+  else if (lower.includes('obra social') || lower.includes('prepaga')) {
+    response = botKnowledge.value?.insuranceInfo || "Emitimos factura para reintegros."
+  }
+  // Fallback
+  else {
+    // Buscar en FAQ
+    const foundFaq = botKnowledge.value?.faqs?.find(f => lower.includes(f.q.toLowerCase()))
+    if (foundFaq) {
+      response = foundFaq.a
+    } else {
+      // Intentar coincidir con intents predefinidos
+      let bestMatch = null
+      let maxScore = 0
+      intents.forEach(intent => {
+        let score = 0
+        intent.patterns.forEach(p => { if (lower.includes(p)) score++ })
+        if (score > maxScore) {
+          maxScore = score
+          bestMatch = intent
+        }
+      })
+      
+      if (bestMatch) {
+         response = bestMatch.response
+      } else {
+         response = "Mmm... no estoy seguro de entender esa consulta específica. 🤔 Pero puedo conectarte directamente con la secretaría."
+         nextOpts = [{ label: '💬 Hablar con Secretaria', action: 'whatsapp_link' }, { label: '📅 Reservar Turno', action: 'turno' }]
+      }
+    }
+  }
+
+  return { text: response, options: nextOpts }
+}
+
 // --- LÓGICA DE REGISTRO PASO A PASO ---
 const handleRegistration = (text) => {
   let response = ""
