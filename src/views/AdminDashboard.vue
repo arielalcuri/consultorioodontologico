@@ -84,7 +84,7 @@
             <div v-for="n in startDayOffset" :key="'blank-'+n" class="day-cell blank"></div>
             <div v-for="day in daysInMonth" :key="day" 
                  class="day-cell" 
-                 :class="{ 'has-turns': getTurnsForDay(day).length > 0, 'selected': selectedDay === day }"
+                 :class="{ 'has-turns': getTurnsForDay(day).length > 0, 'selected': selectedDay === day, 'past-day': isPastDay(day) }"
                  @click="selectDay(day)">
               <span class="day-num">{{ day }}</span>
               <div v-if="getTurnsForDay(day).length > 0" class="turn-indicator">
@@ -445,6 +445,9 @@ const now = new Date()
 const currentMonth = ref(now.getMonth())
 const currentYear = ref(now.getFullYear())
 
+// Auto-seleccionar el día de hoy al cargar
+const selectedDay = ref(now.getDate())
+
 const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
 const weekDays = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
 
@@ -478,6 +481,14 @@ const confirmedTurnos = computed(() => allTurnos.value.filter(t => t.status === 
 // Calendar Logic
 const daysInMonth = computed(() => new Date(currentYear.value, currentMonth.value + 1, 0).getDate())
 const startDayOffset = computed(() => new Date(currentYear.value, currentMonth.value, 1).getDay())
+
+// Helper para saber si un día ya pasó
+const isPastDay = (day) => {
+  const checkDate = new Date(currentYear.value, currentMonth.value, day)
+  const today = new Date()
+  today.setHours(0,0,0,0)
+  return checkDate < today
+}
 
 const getTurnsForDay = (day) => {
   const dateStr = `${currentYear.value}-${String(currentMonth.value + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
@@ -576,6 +587,7 @@ td { padding: 1rem; border-top: 1px solid #f1f5f9; }
 .day-cell.blank { background: transparent; cursor: default; }
 .day-cell.blank:hover { transform: none; }
 .day-cell.selected { border-color: #0e7490; background: #ecfeff; }
+.day-cell.past-day { opacity: 0.5; background: #f1f5f9; }
 .day-cell.has-turns { background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 .day-num { font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; }
 .turn-indicator { font-size: 0.75rem; background: #0e7490; color: white; padding: 0.2rem 0.5rem; border-radius: 20px; text-align: center; font-weight: 600; }
