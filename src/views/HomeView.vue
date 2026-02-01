@@ -21,15 +21,20 @@
 
         <div class="nav-actions">
           <button @click="openBookingModal" class="btn btn-primary shadow-pulse">Reservar Cita</button>
-          <button class="mobile-menu-btn" @click="mobileMenuOpen = !mobileMenuOpen">
-            <span></span><span></span><span></span>
-          </button>
-        </div>
+          <button class="mobile-menu-btn" @click="toggleMenu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
       </div>
     </nav>
 
+    <!-- Mobile Menu Overlay -->
+    <div v-if="menuOpen" class="mobile-menu-overlay fade-in" @click="toggleMenu"></div>
+
     <!-- Mobile Menu -->
-    <div class="mobile-menu" :class="{ 'active': mobileMenuOpen }">
+    <div class="mobile-menu" :class="{ 'active': menuOpen }">
+      <button class="close-menu-btn" @click="toggleMenu">&times;</button>
       <div class="mobile-links">
         <a href="#inicio" @click="mobileMenuOpen = false">Inicio</a>
         <a href="#servicios" @click="mobileMenuOpen = false">Tratamientos</a>
@@ -280,10 +285,15 @@ import { allServices, addTurno, registerUser, siteConfig } from '../store'
 const scrollY = ref(0)
 const mobileMenuOpen = ref(false)
 const showModal = ref(false)
+const menuOpen = ref(false)
 const submitting = ref(false)
 const success = ref(false)
 const activeFaq = ref(0)
 const selectedServiceImg = ref(null)
+
+const toggleMenu = () => {
+    menuOpen.value = !menuOpen.value
+}
 
 const openLightbox = (service) => {
   selectedServiceImg.value = service
@@ -522,14 +532,18 @@ input::placeholder, textarea::placeholder { color: #94a3b8; }
 .mobile-menu-btn { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 0.5rem; }
 .mobile-menu-btn span { width: 25px; height: 3px; background: #0e7490; border-radius: 3px; transition: 0.3s; }
 
+.mobile-menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); z-index: 1400; backdrop-filter: blur(5px); }
 .mobile-menu { 
-  position: fixed; top: 0; right: -100%; width: 80%; height: 100vh; 
-  background: white; z-index: 1500; transition: 0.5s; padding: 6rem 2rem;
-  box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+  position: fixed; top: 0; right: -100%; width: 85%; max-width: 350px; height: 100vh; 
+  background: white; z-index: 1500; transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s; padding: 6rem 2rem;
+  box-shadow: -10px 0 30px rgba(0,0,0,0.2);
 }
 .mobile-menu.active { right: 0; }
+.close-menu-btn { position: absolute; top: 2rem; right: 2rem; background: #f1f5f9; border: none; font-size: 2rem; cursor: pointer; color: #475569; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+.close-menu-btn:hover { background: #e2e8f0; color: #0e7490; transform: rotate(90deg); }
 .mobile-links { display: flex; flex-direction: column; gap: 2rem; }
-.mobile-links a { font-size: 1.5rem; font-weight: 700; text-decoration: none; color: #1e293b; }
+.mobile-links a { font-size: 1.4rem; font-weight: 700; text-decoration: none; color: #1e293b; display: flex; align-items: center; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #f1f5f9; transition: 0.3s; }
+.mobile-links a:hover { color: #0e7490; padding-left: 10px; border-color: #e2e8f0; }
 
 /* Responsive */
 @media (max-width: 992px) {
