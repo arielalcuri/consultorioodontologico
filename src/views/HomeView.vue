@@ -136,7 +136,9 @@
           <h2 class="section-title">Lo que dicen nuestros <span class="highlight-text">Pacientes</span></h2>
         </div>
         <div class="testimonials-widget mt-12">
-          <iframe src='https://widgets.sociablekit.com/google-reviews/iframe/25649984' frameborder='0' width='100%' height='600'></iframe>
+          <!-- Elfsight Google Reviews -->
+          <component :is="'script'" src="https://elfsightcdn.com/platform.js" async></component>
+          <div class="elfsight-app-fb80eddf-7112-48f2-ac0c-24fc31e6fa2d" data-elfsight-app-lazy></div>
         </div>
       </div>
     </section>
