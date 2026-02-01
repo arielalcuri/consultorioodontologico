@@ -190,9 +190,9 @@ const defaultSiteConfig = {
     heroImage: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1000&auto=format&fit=crop',
     aboutImage: 'https://estudidentalbarcelona.com/wp-content/uploads/2017/08/tomografia-dientes.jpg',
     faqs: [
-        { id: 1, q: '¿Aceptan obras sociales?', a: 'Sí, trabajamos con OSDE, Swiss Medical, Galeno y Medicus.' },
+        { id: 1, q: '¿Aceptan obras sociales?', a: 'No, no trabajamos con obras sociales/prepagas. En caso de necesitar reintegro, realizamos la factura y la orden con el diagnóstico para que puedas solicitar el reintegro.' },
         { id: 2, q: '¿Tienen estacionamiento?', a: 'Hay estacionamiento libre sobre la calle Cosquín y alrededores.' },
-        { id: 3, q: '¿Atienden urgencias?', a: 'Atendemos urgencias dentro de nuestro horario de atención (Martes y Jueves). Para urgencias fuera de horario, recomendamos dirigirse a su guardia de prepaga.' }
+        { id: 3, q: '¿Atienden urgencias?', a: 'Atendemos urgencias dentro de nuestro horario de atención (Martes y Jueves). En caso que necesites una atención inmediata, te solicitamos que te pongas en contacto con nosotros a los teléfonos: 4601-8957 o al 11 3001-9567.' }
     ]
 }
 
