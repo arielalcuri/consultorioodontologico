@@ -83,15 +83,6 @@
 
 <script setup>
 import { ref, onMounted, nextTick, watch } from 'vue'
-import { allServices, botKnowledge, findUserByDetails, addTurno, allTurnos, deleteTurno } from '../store'
-
-const isOpen = ref(false)
-const userInput = ref('')
-const isTyping = ref(false)
-const messageContainer = ref(null)
-const inputField = ref(null)
-const showBadge = ref(true)
-
 const bookingState = ref({
   active: false,
   extractedUser: null,
@@ -100,14 +91,14 @@ const bookingState = ref({
   cancelMode: false,
   serviceMode: false,
   customMode: false,
-  registrationMode: false, // Nuevo: Modo Registro
-  regStep: 0, // 0: Nombre, 1: Apellido, 2: Email, 3: Teléfono
-  tempUser: {}, // Datos temporales del usuario nuevo
-  startActionAfterReg: null, // Acción a ejecutar post-registro
+  registrationMode: false,
+  regStep: 0,
+  tempUser: {}, 
+  startActionAfterReg: null,
   turnosToList: []
 })
 
-// Función para normalizar texto (quitar tildes y pasar a minúsculas)
+// Función para normalizar texto
 const normalizeText = (text) => {
   if (!text) return ""
   return text.toLowerCase()
@@ -160,7 +151,7 @@ const fetchFeriados = async () => {
 fetchFeriados()
 
 const messages = ref([
-  { role: 'bot', text: botKnowledge.value.welcome }
+  { role: 'bot', text: botKnowledge.value?.welcome || '¡Hola! Soy tu asistente virtual.' }
 ])
 
 const toggleChat = () => { isOpen.value = !isOpen.value }
@@ -171,12 +162,12 @@ const intents = [
   {
     id: 'saludo',
     patterns: ['hola', 'hey', 'buen dia', 'buenas tardes', 'como estas', 'saludos', 'quien sos'],
-    response: botKnowledge.value.welcome
+    response: botKnowledge.value?.welcome
   },
   {
     id: 'turnos',
     patterns: ['turno', 'cita', 'agendar', 'reservar', 'visita', 'dental', 'sacar'],
-    response: botKnowledge.value.appointmentInfo
+    response: botKnowledge.value?.appointmentInfo
   },
   {
     id: 'servicios',
@@ -189,12 +180,12 @@ const intents = [
   {
     id: 'contacto',
     patterns: ['telefono', 'numero', 'whatsapp', 'llamar', 'celular', 'contacto', 'comunicar'],
-    response: botKnowledge.value.contactInfo
+    response: botKnowledge.value?.contactInfo
   },
   {
     id: 'ubicacion',
     patterns: ['donde', 'direccion', 'ubicados', 'llegar', 'mapa', 'calle', 'lugano'],
-    response: botKnowledge.value.locationInfo || 'Estamos en Cosquín 4809, Villa Lugano, CABA.'
+    response: botKnowledge.value?.locationInfo || 'Estamos en Cosquín 4809, Villa Lugano, CABA.'
   },
   {
     id: 'precios',
@@ -204,56 +195,119 @@ const intents = [
   {
     id: 'obras_sociales',
     patterns: ['obra social', 'prepaga', 'osde', 'swiss', 'galeno', 'medicus', 'cobertura', 'aceptan', 'toman'],
-    response: botKnowledge.value.insuranceInfo
+    response: botKnowledge.value?.insuranceInfo
   }
 ]
 
 // --- LÓGICA DE REGISTRO PASO A PASO ---
 const handleRegistration = (text) => {
   let response = ""
+  let options = []
   const state = bookingState.value
+
+  // Helper para validar fecha
+  const parseDate = (str) => {
+    const parts = str.split('/')
+    if (parts.length === 3) {
+       const d = parseInt(parts[0])
+       const m = parseInt(parts[1])
+       const y = parseInt(parts[2])
+       if (!isNaN(d) && !isNaN(m) && !isNaN(y) && y > 1900 && y < 2025) return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`
+    }
+    return null
+  }
 
   if (state.regStep === 0) { // Nombre
     state.tempUser.firstName = text
     state.regStep++
-    response = `Perfecto ${text}. ¿Cuál es tu <strong>Apellido</strong>?`
-  } else if (state.regStep === 1) { // Apellido
+    response = `Un gusto, ${text}. ¿Cuál es tu <strong>Apellido</strong>?`
+  } 
+  else if (state.regStep === 1) { // Apellido
     state.tempUser.lastName = text
     state.regStep++
-    response = "Gracias. Ahora necesito tu <strong>Email</strong> para enviarte confirmaciones:"
-  } else if (state.regStep === 2) { // Email
-    state.tempUser.email = text
-    state.regStep++
-    response = "¡Casi listo! Por último, indícame un <strong>Teléfono</strong> de contacto:"
-  } else if (state.regStep === 3) { // Teléfono / Finalizar
-    state.tempUser.phone = text
-    
-    // Crear el usuario real
-    const newUser = {
-      name: state.tempUser.firstName,
-      lastName: state.tempUser.lastName,
-      dni: state.tempUser.dni,
-      email: state.tempUser.email,
-      phone: state.tempUser.phone,
-      birthDate: new Date().toISOString().split('T')[0], // Default hoy
-      password: 'paciente'
-    }
-    
-    registerUser(newUser) // Guardar en store
-    
-    state.extractedUser = newUser // Auto-login en el contexto del chat
-    state.active = true // Usuario activo
-    state.registrationMode = false // Fin registro
-    
-    response = `¡Registro completado con éxito, <strong>${newUser.name}</strong>! 🎉<br>Ya eres parte de nuestra base de pacientes.<br><br>¿Te gustaría agendar ese turno ahora?`
-    
-    // Restaurar contexto previo si existía intención
-    if (state.startActionAfterReg) {
-      setTimeout(() => sendMessage(null, state.startActionAfterReg), 1500)
+    response = `Bien. Ahora necesito tu <strong>Fecha de Nacimiento</strong> (Formato: dd/mm/aaaa):`
+  }
+  else if (state.regStep === 2) { // Fecha Nacimiento
+    const validDate = parseDate(text)
+    if (validDate) {
+      state.tempUser.birthDate = validDate
+      state.regStep++
+      response = `Perfecto. ¿Cuál es tu <strong>Domicilio</strong>? (Calle, Número, Localidad)`
+    } else {
+      response = `El formato no parece correcto. Por favor ingresalo como <strong>dd/mm/aaaa</strong> (Ej: 12/05/1990)`
     }
   }
+  else if (state.regStep === 3) { // Domicilio
+    state.tempUser.address = text
+    state.regStep++
+    response = `Gracias. Indicame un <strong>Teléfono</strong> de contacto:`
+  }
+  else if (state.regStep === 4) { // Teléfono
+    state.tempUser.phone = text
+    state.regStep++
+    response = `Ya casi terminamos. Indicame tu <strong>Email</strong>:`
+  }
+  else if (state.regStep === 5) { // Email
+    if (text.includes('@')) {
+        state.tempUser.email = text
+        state.regStep++
+        response = `Por último, elige una <strong>Contraseña</strong> para tu cuenta:`
+    } else {
+        response = `Por favor ingresa un email válido.`
+    }
+  }
+  else if (state.regStep === 6) { // Contraseña -> Confirmación
+    state.tempUser.password = text
+    state.regStep++
+    
+    // Resumen
+    response = `¡Genial! Por favor confirma si estos datos son correctos:<br><br>
+    👤 <strong>${state.tempUser.firstName} ${state.tempUser.lastName}</strong><br>
+    🎂 <strong>${state.tempUser.birthDate}</strong><br>
+    📍 <strong>${state.tempUser.address}</strong><br>
+    📞 <strong>${state.tempUser.phone}</strong><br>
+    📧 <strong>${state.tempUser.email}</strong><br>
+    🆔 <strong>DNI: ${state.tempUser.dni}</strong><br><br>
+    ¿Son correctos?`
+    options = [{ label: '✅ Sí, Registrarme', action: 'confirm_reg' }, { label: '❌ No, Reiniciar', action: 'cancel_reg' }]
+  }
+  else if (state.regStep === 7) { // Accion final
+     if (text.toLowerCase() === 'confirm_reg' || text.toLowerCase().includes('si')) {
+        // Crear usuario
+        const newUser = {
+          name: state.tempUser.firstName,
+          lastName: state.tempUser.lastName,
+          dni: state.tempUser.dni,
+          email: state.tempUser.email,
+          phone: state.tempUser.phone,
+          birthDate: state.tempUser.birthDate,
+          address: state.tempUser.address, // Nuevo campo
+          password: state.tempUser.password
+        }
+        
+        registerUser(newUser)
+        
+        state.extractedUser = newUser
+        state.active = true
+        state.registrationMode = false
+        
+        response = `¡Bienvenido/a <strong>${newUser.name}</strong>! Tu cuenta ha sido creada con éxito. 🎉<br>Ahora puedes gestionar tus turnos desde el chat o el portal.`
+        
+        // Retomar acción previa si existía
+        if (state.startActionAfterReg) {
+             setTimeout(() => sendMessage(null, state.startActionAfterReg), 1500)
+        } else {
+             response += `<br><br>¿Te gustaría agendar un turno ahora?`
+             options = [{ label: '📅 Reservar Turno', action: 'turno' }]
+        }
+     } else {
+         state.registrationMode = false
+         response = "Entendido. He cancelado el registro. ¿En qué más puedo ayudarte?"
+         options = defaultOptions
+     }
+  }
   
-  return { text: response, options: [] }
+  return { text: response, options: options }
 }
 
 const sendMessage = (e, forceAction = null) => {
@@ -265,7 +319,7 @@ const sendMessage = (e, forceAction = null) => {
     messages.value.push({ role: 'user', text: text, time: getTime() })
   }
   userInput.value = ''
-  currentOptions.value = [] // Ocultar opciones mientras piensa
+  currentOptions.value = [] // Ocultar opciones
   isTyping.value = true
   scrollToBottom()
 
@@ -273,17 +327,19 @@ const sendMessage = (e, forceAction = null) => {
     let result = { text: "", options: [] }
 
     // --- MODO REGISTRO ---
-    if (bookingState.value.registrationMode && !forceAction) {
-      result = handleRegistration(text)
+    if (bookingState.value.registrationMode) {
+      // Si es una acción forzada (click en boton confirmación), pasamos eso, sino el texto
+      const input = forceAction || text
+      result = handleRegistration(input)
     } 
     else {
       // --- FLUJO NORMAL ---
       const lower = text.toLowerCase()
       
-      // Chequear DNI en flujo general
+      // Chequear DNI solo si no estamos en medio de otra cosa
       const dni = extractDni(lower)
       
-      if (dni) {
+      if (dni && !bookingState.value.active) {
           const user = findUserByDetails(dni, lower)
           if (user) {
               bookingState.value.extractedUser = user
@@ -293,9 +349,9 @@ const sendMessage = (e, forceAction = null) => {
               // INICIAR REGISTRO SI NO EXISTE
               bookingState.value.registrationMode = true
               bookingState.value.regStep = 0
-              bookingState.value.tempUser = { dni: dni } // Guardamos DNI
-              bookingState.value.startActionAfterReg = forceAction // Guardar intención original
-              result = { text: `No encuentro el DNI <strong>${dni}</strong> en mi sistema. 😕<br><br>¡Pero no hay problema! Vamos a registrarte rápidamente.<br>Por favor, dime tu <strong>Nombre</strong> (sin apellido):`, options: [] }
+              bookingState.value.tempUser = { dni: dni } 
+              bookingState.value.startActionAfterReg = forceAction 
+              result = { text: `No encuentro el DNI <strong>${dni}</strong> en mi sistema. 😕<br><br>¡Pero no hay problema! Vamos a registrarte rápidamente.<br>Por favor, indicame tu <strong>Nombre</strong>:`, options: [] }
           }
       } else {
           result = processIntent(text, forceAction)
@@ -304,7 +360,7 @@ const sendMessage = (e, forceAction = null) => {
     
     messages.value.push({ role: 'bot', text: result.text, time: getTime() })
     isTyping.value = false
-    currentOptions.value = result.options
+    currentOptions.value = result.options || [] // Ensure array
     nextTick(scrollToBottom)
   }, 1200)
 }
