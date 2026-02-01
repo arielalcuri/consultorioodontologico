@@ -291,7 +291,7 @@ const showModal = ref(false)
 const menuOpen = ref(false)
 const submitting = ref(false)
 const success = ref(false)
-const activeFaq = ref(0)
+const activeFaq = ref(-1)
 const selectedServiceImg = ref(null)
 
 const toggleMenu = () => {
