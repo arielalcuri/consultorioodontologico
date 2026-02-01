@@ -538,8 +538,8 @@ input::placeholder, textarea::placeholder { color: #94a3b8; }
   box-shadow: -10px 0 30px rgba(0,0,0,0.2);
 }
 .mobile-menu.active { right: 0; }
-.close-menu-btn { position: absolute; top: 2rem; right: 2rem; background: #f1f5f9; border: none; font-size: 2rem; cursor: pointer; color: #475569; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
-.close-menu-btn:hover { background: #e2e8f0; color: #0e7490; transform: rotate(90deg); }
+.close-menu-btn { position: absolute; top: 1.5rem; right: 1.5rem; background: #f1f5f9; border: none; font-size: 2.5rem; line-height: 1; cursor: pointer; color: #0e7490; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.3s; z-index: 1550; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+.close-menu-btn:hover { background: #e2e8f0; transform: rotate(90deg); }
 .mobile-links { display: flex; flex-direction: column; gap: 2rem; }
 .mobile-links a { font-size: 1.4rem; font-weight: 700; text-decoration: none; color: #1e293b; display: flex; align-items: center; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #f1f5f9; transition: 0.3s; }
 .mobile-links a:hover { color: #0e7490; padding-left: 10px; border-color: #e2e8f0; }
