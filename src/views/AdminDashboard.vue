@@ -87,6 +87,8 @@
                  :class="{ 'has-turns': getTurnsForDay(day).length > 0, 'selected': selectedDay === day, 'past-day': isPastDay(day) }"
                  @click="selectDay(day)">
               <span class="day-num">{{ day }}</span>
+              
+              <!-- Indicadores Desagregados -->
               <div v-if="getTurnsForDay(day).length > 0" class="indicators-wrapper">
                 <div v-if="getTurnStats(day).orto > 0" class="turn-indicator orto">
                   {{ getTurnStats(day).orto }} Ortodoncia
@@ -410,8 +412,8 @@
               <div class="form-group"><label>Nombre</label><input v-model="editUserForm.name"></div>
               <div class="form-group"><label>Apellido</label><input v-model="editUserForm.lastName"></div>
             </div>
-            <div class="form-group"><label>Email</label><input v-model="editUserForm.email" disabled></div>
-            <div class="form-group"><label>Nueva Clave (opcional)</label><input v-model="editUserForm.password" type="text" placeholder="Nueva contraseña"></div>
+            <div class="form-group"><label>Email</label><input v-model="editUserForm.email" disabled autocomplete="username"></div>
+            <div class="form-group"><label>Nueva Clave (opcional)</label><input v-model="editUserForm.password" type="password" placeholder="Nueva contraseña" autocomplete="new-password"></div>
             <button type="submit" class="btn btn-primary btn-full">Guardar</button>
          </form>
        </div>
@@ -608,10 +610,10 @@ td { padding: 1rem; border-top: 1px solid #f1f5f9; }
 .day-cell.has-turns { background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 .day-num { font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; }
 .day-num { font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; }
-.indicators-wrapper { display: flex; flex-direction: column; gap: 4px; width: 100%; }
-.turn-indicator { font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 6px; text-align: center; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.turn-indicator.orto { background: #8b5cf6; } /* Violeta para Ortodoncia */
-.turn-indicator.gral { background: #0ea5e9; } /* Azul para General */
+.indicators-wrapper { display: flex; flex-direction: column; gap: 3px; width: 100%; margin-top: auto; }
+.turn-indicator { font-size: 0.65rem; padding: 0.25rem 0.4rem; border-radius: 4px; text-align: left; font-weight: 700; color: white !important; line-height: 1.2; }
+.turn-indicator.orto { background-color: #7c3aed !important; border-left: 3px solid #4c1d95; } /* Violeta Fuerte */
+.turn-indicator.gral { background-color: #0284c7 !important; border-left: 3px solid #075985; } /* Azul Fuerte */
 
 .badge-specialty { padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; color: white; background: #64748b; }
 .badge-specialty.orto { background: #8b5cf6; }
