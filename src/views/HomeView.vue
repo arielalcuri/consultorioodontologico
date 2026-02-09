@@ -41,8 +41,9 @@
       <div class="mobile-links">
         <a href="#inicio" @click="menuOpen = false">Inicio</a>
         <a href="#servicios" @click="menuOpen = false">Tratamientos</a>
-        <a href="#contacto" @click="menuOpen = false">Contacto</a>
-        <router-link to="/admin" class="admin-link text-center mt-4" @click="menuOpen = false">Administración</router-link>
+        <a href="#nosotros" @click="menuOpen = false">Nosotros</a>
+        <router-link to="/pacientes" @click="menuOpen = false">Pacientes</router-link>
+        <router-link to="/login" class="text-sm font-semibold !text-slate-400 mt-2" @click="menuOpen = false">Acceso Profesional</router-link>
         <button @click="{ openBookingModal(); menuOpen = false }" class="btn btn-primary mt-4">Reservar Cita</button>
       </div>
     </div>
@@ -141,9 +142,7 @@
           <h2 class="section-title">Lo que dicen nuestros <span class="highlight-text">Pacientes</span></h2>
         </div>
         <div class="testimonials-widget mt-12">
-          <!-- Elfsight Google Reviews -->
-          <component :is="'script'" src="https://elfsightcdn.com/platform.js" async></component>
-          <div class="elfsight-app-fb80eddf-7112-48f2-ac0c-24fc31e6fa2d" data-elfsight-app-lazy></div>
+            <div class="sk-ww-google-reviews" data-embed-id="25649984"></div>
         </div>
       </div>
     </section>
@@ -200,7 +199,7 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p>&copy; 2026 Centro Odontológico Integral Dra. Adriana Pagnotta. Todos los derechos reservados.</p>
+        <p>&copy; 2026 Centro Odontológico Integral Dra. Adriana Pagnotta. Todos los derechos reservados. <span style="opacity:0.5; font-size:0.8em">v1.5</span></p>
       </div>
     </footer>
 
@@ -313,9 +312,19 @@ const fetchFeriados = async () => {
 }
 
 const updateScroll = () => { scrollY.value = window.scrollY }
+
 onMounted(() => {
   window.addEventListener('scroll', updateScroll)
   fetchFeriados()
+  // SociableKit Script Injection
+  const scriptId = 'SociableKitScript'
+  if (!document.getElementById(scriptId)) {
+    const js = document.createElement('script')
+    js.id = scriptId
+    js.src = "https://widgets.sociablekit.com/google-reviews/widget.js"
+    js.defer = true
+    document.head.appendChild(js)
+  }
 })
 onUnmounted(() => window.removeEventListener('scroll', updateScroll))
 
@@ -597,14 +606,17 @@ footer .logo-text .sub-brand { color: #cbd5e1 !important; }
 
 /* Testimonials Styles */
 .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
-.review-card { background: white; padding: 2.5rem; border-radius: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(14, 116, 144, 0.1); transition: 0.3s; position: relative; overflow: hidden; }
-.review-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.08); }
-.stars { color: #f59e0b; margin-bottom: 1rem; font-size: 0.9rem; }
-.review-text { font-size: 1.05rem; font-style: italic; color: #334155; margin-bottom: 2rem; line-height: 1.6; }
-.review-author { display: flex; align-items: center; gap: 1rem; margin-top: auto; }
-.author-avatar { width: 45px; height: 45px; background: #0e7490; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; }
-.author-info h4 { margin: 0; font-size: 0.95rem; color: #0f172a; font-weight: 700; }
-.author-info span { font-size: 0.8rem; color: #64748b; }
+.review-card { background: white; padding: 2rem; border-radius: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; transition: 0.3s; display: flex; flex-direction: column; }
+.review-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.08); border-color: #0e7490; }
+.review-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+.reviewer-avatar { width: 45px; height: 45px; background: #eab308; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; text-transform: uppercase; }
+.reviewer-info h4 { margin: 0; font-size: 1rem; color: #1e293b; font-weight: 700; }
+.stars { font-size: 0.85rem; display: flex; gap: 2px; }
+.stars .gold { color: #f59e0b; }
+.stars .gray { color: #cbd5e1; }
+.google-icon { margin-left: auto; color: #ea4335; font-size: 1.5rem; opacity: 0.8; }
+.review-text { font-size: 1rem; font-style: italic; color: #475569; margin-bottom: 1rem; line-height: 1.6; flex-grow: 1; }
+.review-date { font-size: 0.8rem; color: #94a3b8; text-align: right; display: block; }
 
 @media (max-width: 768px) {
   .testimonials-grid { grid-template-columns: 1fr; }

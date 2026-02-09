@@ -3,7 +3,8 @@
     <!-- Floating Button with Notification -->
     <div class="toggle-container">
       <button @click="toggleChat" class="chat-toggle-btn shadow-pulse" :class="{ 'active': isOpen }">
-        <i :class="isOpen ? 'fas fa-chevron-down' : 'fas fa-robot'"></i>
+        <i v-if="isOpen" class="fas fa-chevron-down"></i>
+        <img v-else :src="botImage" alt="Chat" class="toggle-bot-img" />
       </button>
       <div v-if="!isOpen && showBadge" class="chat-notification scale-in">
         <span>¡Hola! ¿Te ayudo? 👋</span>
@@ -17,7 +18,7 @@
         <div class="chat-header">
           <div class="bot-status-wrapper">
             <div class="bot-avatar-container">
-              <i class="fas fa-tooth bot-icon"></i>
+              <img :src="botImage" alt="Bot Avatar" class="bot-avatar-main" />
               <div class="status-dot"></div>
             </div>
             <div class="bot-info">
@@ -33,7 +34,9 @@
           <div class="chat-start-time">Hoy</div>
           
           <div v-for="(msg, index) in messages" :key="index" :class="['message-row', msg.role]">
-            <div v-if="msg.role === 'bot'" class="mini-avatar"><i class="fas fa-tooth"></i></div>
+            <div v-if="msg.role === 'bot'" class="mini-avatar">
+              <img :src="botImage" alt="Bot" class="bot-avatar-mini" />
+            </div>
             <div class="message-bubble" :class="msg.role">
               <div class="msg-content" v-html="msg.text"></div>
               <span class="msg-time">{{ msg.time }}</span>
@@ -42,7 +45,9 @@
 
           <!-- Typing Indicator -->
           <div v-if="isTyping" class="message-row bot typing-row">
-            <div class="mini-avatar"><i class="fas fa-tooth"></i></div>
+            <div class="mini-avatar">
+              <img :src="botImage" alt="Bot" class="bot-avatar-mini" />
+            </div>
             <div class="message-bubble bot typing-bubble">
               <div class="typing-dots">
                 <span></span><span></span><span></span>
@@ -183,6 +188,8 @@ const fetchFeriados = async () => {
   } catch (e) { console.error(e) }
 }
 fetchFeriados()
+
+import botImage from '../assets/chatbot-avatar.svg'
 
 const messages = ref([
   { role: 'bot', text: botKnowledge.value?.welcome || '¡Hola! Soy tu asistente virtual.' }
@@ -603,7 +610,9 @@ const sendMessage = (e, forceAction = null) => {
 
 /* Toggle Button */
 .toggle-container { position: relative; }
-.chat-toggle-btn { width: 65px; height: 65px; border-radius: 50%; background: linear-gradient(135deg, #0e7490, #06b6d4); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s; box-shadow: 0 8px 25px rgba(14, 116, 144, 0.4); }
+.chat-toggle-btn { width: 65px; height: 65px; border-radius: 50%; background: linear-gradient(135deg, #0e7490, #06b6d4); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s; box-shadow: 0 8px 25px rgba(14, 116, 144, 0.4); padding: 0; }
+.toggle-bot-img { width: 70%; height: 70%; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+
 .chat-toggle-btn:hover { transform: scale(1.1); box-shadow: 0 12px 30px rgba(14, 116, 144, 0.5); }
 .chat-toggle-btn.active { transform: rotate(180deg) scale(0.9); background: #334155; }
 
@@ -648,6 +657,12 @@ const sendMessage = (e, forceAction = null) => {
 .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
 @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
+
+/* Bot Avatar Images */
+.bot-avatar-main { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; background: white; padding: 2px; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.mini-avatar { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: white; padding: 2px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.bot-avatar-mini { width: 100%; height: 100%; object-fit: contain; }
+.bot-avatar-container i.bot-icon { display: none; } /* Ocultar icono viejo */
 
 /* Quick Actions */
 .quick-actions { padding: 0.5rem 1rem; display: flex; gap: 8px; overflow-x: auto; white-space: nowrap; scrollbar-width: none; mask-image: linear-gradient(to right, black 90%, transparent 100%); }

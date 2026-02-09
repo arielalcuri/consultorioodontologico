@@ -87,8 +87,6 @@
                  :class="{ 'has-turns': getTurnsForDay(day).length > 0, 'selected': selectedDay === day, 'past-day': isPastDay(day) }"
                  @click="selectDay(day)">
               <span class="day-num">{{ day }}</span>
-              
-              <!-- Indicadores Desagregados -->
               <div v-if="getTurnsForDay(day).length > 0" class="indicators-wrapper">
                 <div v-if="getTurnStats(day).orto > 0" class="turn-indicator orto">
                   {{ getTurnStats(day).orto }} Ortodoncia
@@ -105,7 +103,11 @@
         <div v-if="selectedDay" class="day-details mt-8 slide-up">
           <div class="details-header">
             <h4>Turnos para el {{ selectedDay }}/{{ currentMonth + 1 }}/{{ currentYear }}</h4>
-            <button @click="selectedDay = null" class="btn-close-details">&times;</button>
+            <h4>Turnos para el {{ selectedDay }}/{{ currentMonth + 1 }}/{{ currentYear }}</h4>
+            <div style="display: flex; gap: 10px;">
+              <button @click="openManualTurnModal" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Asignar Turno</button>
+              <button @click="selectedDay = null" class="btn-close-details">&times;</button>
+            </div>
           </div>
           <div v-if="getTurnsForDay(selectedDay).length > 0" class="table-container mt-4">
             <table>
@@ -256,6 +258,41 @@
                       <i class="fas fa-trash"></i>
                     </button>
                   </div>
+
+          <div class="admin-card">
+            <div class="card-header flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-star"></i>
+                <h3>Reseñas / Testimonios</h3>
+              </div>
+              <button @click="siteConfig.reviews.unshift({ id: Date.now(), name: '', stars: 5, text: '', date: 'Hace 1 mes' })" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus"></i> Nueva Reseña
+              </button>
+            </div>
+            <div class="p-6">
+              <div class="faq-management-list">
+                 <div v-for="(review, index) in (siteConfig.reviews || [])" :key="review.id" class="faq-editor-card">
+                    <div class="faq-editor-main">
+                       <div class="form-row mb-2">
+                          <input v-model="review.name" placeholder="Nombre (Ej: Juan Perez)" class="input-modern">
+                          <select v-model="review.stars" class="input-modern">
+                             <option :value="5">⭐⭐⭐⭐⭐ 5 Estrellas</option>
+                             <option :value="4">⭐⭐⭐⭐ 4 Estrellas</option>
+                             <option :value="3">⭐⭐⭐ 3 Estrellas</option>
+                          </select>
+                       </div>
+                       <input v-model="review.date" placeholder="Fecha (Ej: Hace 2 semanas)" class="input-modern mb-2">
+                       <textarea v-model="review.text" placeholder="Comentario del paciente..." rows="3" class="input-modern"></textarea>
+                    </div>
+                    <div class="faq-editor-side">
+                       <button @click="siteConfig.reviews.splice(index, 1)" class="btn-action-delete">
+                          <i class="fas fa-trash"></i>
+                       </button>
+                    </div>
+                 </div>
+              </div>
+            </div>
+          </div>
                 </div>
               </div>
             </div>
@@ -392,12 +429,13 @@
               <div class="form-group"><label>Apellido</label><input v-model="newUserForm.lastName" required></div>
             </div>
             <div class="form-row">
-              <div class="form-group"><label>DNI</label><input v-model="newUserForm.dni" required></div>
-              <div class="form-group"><label>Teléfono</label><input v-model="newUserForm.phone" required></div>
+              <div class="form-group"><label>DNI *</label><input v-model="newUserForm.dni" required></div>
+              <div class="form-group"><label>F. Nacimiento *</label><input v-model="newUserForm.birthDate" type="date" required></div>
             </div>
-            <div class="form-group"><label>Email</label><input v-model="newUserForm.email" type="email" required autocomplete="email"></div>
-            <div class="form-group"><label>Fecha Nacimiento</label><input v-model="newUserForm.birthDate" type="date"></div>
-            <div class="form-group"><label>Contraseña Acceso</label><input v-model="newUserForm.password" type="password" placeholder="Clave para el portal" autocomplete="current-password"></div>
+            <div class="form-group"><label>Domicilio (Calle, N°, Localidad) *</label><input v-model="newUserForm.address" placeholder="Ej: Av. Rivadavia 1234, Ramos Mejía" required></div>
+            <div class="form-group"><label>Teléfono *</label><input v-model="newUserForm.phone" required></div>
+            <div class="form-group"><label>Email (Opcional)</label><input v-model="newUserForm.email" type="email" autocomplete="email"></div>
+            <div class="form-group"><label>Contraseña *</label><input v-model="newUserForm.password" type="password" required autocomplete="current-password"></div>
             <button type="submit" class="btn btn-primary btn-full">Registrar Paciente</button>
          </form>
        </div>
@@ -430,17 +468,99 @@
          </form>
        </div>
     </div>
+
+    <!-- Manual Turn Modal -->
+    <div v-if="showManualTurnModal" class="modal-overlay" @click.self="showManualTurnModal = false">
+      <div class="modal-content admin-modal scale-in">
+        <h3>Asignar Turno - Paso {{ manualTurnStep }}</h3>
+        
+        <!-- Paso 1: Buscar Paciente -->
+        <div v-if="manualTurnStep === 1">
+           <p class="mb-4">Busque un paciente existente o cree uno nuevo.</p>
+           <div class="form-group">
+             <label>Buscar por Nombre o DNI</label>
+             <input v-model="userSearchQuery" placeholder="Escriba para buscar..." class="input-modern" autofocus>
+           </div>
+           
+           <div v-if="filteredUsers.length > 0" class="user-results-list mt-2">
+              <div v-for="user in filteredUsers" :key="user.email" class="user-result-item" @click="selectUserForTurn(user)">
+                 <strong>{{ user.lastName }}, {{ user.name }}</strong>
+                 <small>DNI: {{ user.dni }}</small>
+              </div>
+           </div>
+           <p v-else-if="userSearchQuery.length > 2" class="text-sm text-gray-500 mt-2">No se encontraron pacientes.</p>
+
+           <div class="mt-6 border-t pt-4">
+              <button @click="goToNewUserStep" class="btn btn-secondary btn-full">
+                <i class="fas fa-user-plus"></i> Crear Nuevo Paciente
+              </button>
+           </div>
+        </div>
+
+        <!-- Paso 2: Crear Nuevo Paciente (Reutilizando campos) -->
+        <div v-if="manualTurnStep === 2">
+           <form @submit.prevent="saveNewUserAndContinue" class="edit-form mt-2">
+              <div class="form-row">
+                <div class="form-group"><label>Nombre *</label><input v-model="newUserForm.name" required></div>
+                <div class="form-group"><label>Apellido *</label><input v-model="newUserForm.lastName" required></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label>DNI *</label><input v-model="newUserForm.dni" required></div>
+                <div class="form-group"><label>F. Nac *</label><input v-model="newUserForm.birthDate" type="date" required></div>
+              </div>
+              <div class="form-group"><label>Domicilio *</label><input v-model="newUserForm.address" placeholder="Calle, N°, Localidad" required></div>
+              <div class="form-group"><label>Teléfono *</label><input v-model="newUserForm.phone" required></div>
+              <div class="form-group"><label>Email (Opcional)</label><input v-model="newUserForm.email" type="email"></div>
+              <div class="form-group"><label>Contraseña *</label><input v-model="newUserForm.password" type="password" required></div>
+              
+              <div class="form-actions mt-4 flex gap-2">
+                 <button type="button" @click="manualTurnStep = 1" class="btn-secondary" style="flex:1">Volver</button>
+                 <button type="submit" class="btn-primary" style="flex:1">Guardar y Continuar</button>
+              </div>
+           </form>
+        </div>
+
+        <!-- Paso 3: Datos del Turno -->
+        <div v-if="manualTurnStep === 3">
+           <div class="selected-user-summary mb-4 p-3 bg-blue-50 rounded border border-blue-100">
+              <p>Paciente: <strong>{{ selectedUserForTurn.lastName }}, {{ selectedUserForTurn.name }}</strong></p>
+              <p>Fecha: <strong>{{ selectedDay }}/{{ currentMonth + 1 }}/{{ currentYear }}</strong></p>
+           </div>
+           
+           <div class="form-group">
+              <label>Horario</label>
+              <input v-model="manualTurnForm.time" type="time" required class="input-modern">
+           </div>
+           <div class="form-group">
+              <label>Especialidad</label>
+              <select v-model="manualTurnForm.type" class="input-modern">
+                 <option v-for="s in allServices" :key="s.id" :value="s.title">{{ s.title }}</option>
+              </select>
+           </div>
+           <div class="form-group">
+              <label>Detalles / Motivo (Opcional)</label>
+              <textarea v-model="manualTurnForm.details" rows="2" class="input-modern"></textarea>
+           </div>
+
+           <div class="form-actions mt-6 flex gap-2">
+              <button @click="manualTurnStep = 1" class="btn-secondary" style="flex:1">Cambiar Paciente</button>
+              <button @click="saveManualTurn" class="btn-primary" style="flex:1">Confirmar Turno</button>
+           </div>
+        </div>
+
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { allTurnos, updateTurno, deleteTurno, allUsers, updateUser, deleteUser, allServices, addService, updateService, deleteService, botKnowledge, siteConfig } from '../store'
+import { allTurnos, updateTurno, deleteTurno, addTurno, allUsers, updateUser, deleteUser, allServices, addService, updateService, deleteService, botKnowledge, siteConfig } from '../store'
 
 const router = useRouter()
 const currentTab = ref('agenda')
-const selectedDay = ref(null)
+// const selectedDay = ref(null) (Removed duplicate declaration)
 
 // Asegurar inicialización de FAQs si el localstorage estaba corrupto
 if (!botKnowledge.value.faqs) {
@@ -464,18 +584,23 @@ const showEditModal = ref(false)
 const showEditUserModal = ref(false)
 const showNewUserModal = ref(false)
 const showServiceModal = ref(false)
+const showManualTurnModal = ref(false)
+const manualTurnStep = ref(1) // 1: Buscar Paciente, 2: Nuevo Paciente, 3: Datos Turno
+const userSearchQuery = ref('')
+const selectedUserForTurn = ref(null)
+const manualTurnForm = ref({ time: '', type: '', details: '' })
 
 const selectedTurno = ref(null)
 const assignedTime = ref('')
 const editForm = ref({})
 const editUserForm = ref({})
-const newUserForm = ref({ name: '', lastName: '', dni: '', email: '', phone: '', birthDate: '', password: 'admin' })
+const newUserForm = ref({ name: '', lastName: '', dni: '', email: '', phone: '', birthDate: '', address: '', password: '' })
 const serviceForm = ref({ title: '', description: '', icon: 'fas fa-tooth' })
 const isEditingService = ref(false)
 
 const tabs = [
   { id: 'solicitudes', name: 'Solicitudes', icon: 'fas fa-bell' },
-  { id: 'agenda', name: 'Agenda Médica', icon: 'fas fa-calendar-alt' },
+  { id: 'agenda', name: 'Agenda/Calendario', icon: 'fas fa-calendar-alt' },
   { id: 'usuarios', name: 'Pacientes', icon: 'fas fa-users' },
   { id: 'servicios', name: 'Servicios', icon: 'fas fa-concierge-bell' },
   { id: 'chatbot', name: 'ChatBot AI', icon: 'fas fa-robot' }
@@ -576,6 +701,77 @@ watch(botKnowledge, () => {
 }, { deep: true })
 
 const handleLogout = () => router.push('/')
+
+// Manual Turn Logic
+const openManualTurnModal = () => {
+    manualTurnStep.value = 1
+    userSearchQuery.value = ''
+    selectedUserForTurn.value = null
+    manualTurnForm.value = { time: '', type: allServices.value[0]?.title || '', details: '' }
+    // Pre-limpiar formulario
+    newUserForm.value = { name: '', lastName: '', dni: '', email: '', phone: '', birthDate: '', address: '', password: '' }
+    showManualTurnModal.value = true
+}
+
+const filteredUsers = computed(() => {
+    if (!userSearchQuery.value) return []
+    const lower = userSearchQuery.value.toLowerCase()
+    return allUsers.value.filter(u => 
+        u.name.toLowerCase().includes(lower) || 
+        u.lastName.toLowerCase().includes(lower) || 
+        u.dni.includes(lower)
+    ).slice(0, 5) // Limitar resultados
+})
+
+const selectUserForTurn = (user) => {
+    selectedUserForTurn.value = user
+    manualTurnStep.value = 3
+}
+
+const goToNewUserStep = () => {
+    manualTurnStep.value = 2
+}
+
+const saveNewUserAndContinue = () => {
+    // Validar campos obligatorios
+    const f = newUserForm.value
+    if(!f.name || !f.lastName || !f.dni || !f.birthDate || !f.address || !f.phone || !f.password) {
+        alert('Por favor complete todos los campos obligatorios (marcados con *)')
+        return
+    }
+    // Guardar usuario
+    allUsers.value.push({ ...newUserForm.value })
+    selectedUserForTurn.value = { ...newUserForm.value }
+    alert('Paciente creado correctamente')
+    manualTurnStep.value = 3
+}
+
+const saveManualTurn = () => {
+    if (!manualTurnForm.value.time) {
+        alert('Debe asignar un horario')
+        return
+    }
+    
+    // Construir fecha formato YYYY-MM-DD
+    const dateStr = `${currentYear.value}-${String(currentMonth.value + 1).padStart(2, '0')}-${String(selectedDay.value).padStart(2, '0')}`
+
+    addTurno({
+        firstName: selectedUserForTurn.value.name,
+        lastName: selectedUserForTurn.value.lastName,
+        dni: selectedUserForTurn.value.dni,
+        email: selectedUserForTurn.value.email,
+        phone: selectedUserForTurn.value.phone,
+        birthDate: selectedUserForTurn.value.birthDate,
+        type: manualTurnForm.value.type,
+        details: manualTurnForm.value.details || 'Turno administrativo',
+        selectedDate: dateStr,
+        status: 'confirmado',
+        assignedTime: manualTurnForm.value.time
+    })
+    
+    showManualTurnModal.value = false
+    alert('Turno asignado correctamente')
+}
 </script>
 
 <style scoped>
@@ -608,7 +804,6 @@ td { padding: 1rem; border-top: 1px solid #f1f5f9; }
 .day-cell.selected { border-color: #0e7490; background: #ecfeff; }
 .day-cell.past-day { opacity: 0.5; background: #f1f5f9; }
 .day-cell.has-turns { background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-.day-num { font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; }
 .day-num { font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; }
 .indicators-wrapper { display: flex; flex-direction: column; gap: 3px; width: 100%; margin-top: auto; }
 .turn-indicator { font-size: 0.65rem; padding: 0.25rem 0.4rem; border-radius: 4px; text-align: left; font-weight: 700; color: white !important; line-height: 1.2; }
@@ -672,4 +867,11 @@ input, select, textarea { padding: 0.8rem; border: 1px solid #e2e8f0; border-rad
 .preview-img-admin { border-radius: 0.5rem; overflow: hidden; height: 80px; border: 1px solid #e2e8f0; }
 .preview-img-admin img { width: 100%; height: 100%; object-fit: cover; }
 .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+
+/* Manual Turn Styles */
+.user-results-list { border: 1px solid #e2e8f0; border-radius: 0.5rem; max-height: 200px; overflow-y: auto; }
+.user-result-item { padding: 0.8rem; cursor: pointer; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
+.user-result-item:hover { background: #f8fafc; color: #0e7490; }
+.user-result-item:last-child { border-bottom: none; }
+.selected-user-summary p { margin: 0; color: #1e293b; font-size: 0.9rem; }
 </style>
