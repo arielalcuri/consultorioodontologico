@@ -88,7 +88,7 @@
 
 <script setup>
 import { ref, onMounted, nextTick, watch } from 'vue'
-import { allServices, botKnowledge, findUserByDetails, addTurno, allTurnos, deleteTurno, registerUser } from '../store'
+import { allServices, botKnowledge, findUserByDetails, addTurno, allTurnos, deleteTurno, registerUser, siteConfig } from '../store'
 import { db } from '../firebase'
 import { doc, getDoc } from 'firebase/firestore'
 
@@ -322,7 +322,7 @@ const processIntent = (input, forceAction = null) => {
 
 // --- INTELLIGENT AI (Gemini) ---
 const callGeminiAI = async (userText) => {
-  if (!botKnowledge.value.geminiKey) return null
+  if (!botKnowledge.value.geminiKey || !siteConfig.value) return null
 
   const clinicContext = `
     Eres la asistente virtual del "Centro Odontológico Integral Dra. Adriana Pagnotta".
