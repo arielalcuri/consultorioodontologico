@@ -279,6 +279,10 @@
                       <i class="fas fa-trash"></i>
                     </button>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <div class="admin-card">
             <div class="card-header flex justify-between items-center">
@@ -311,10 +315,6 @@
                        </button>
                     </div>
                  </div>
-              </div>
-            </div>
-          </div>
-                </div>
               </div>
             </div>
           </div>
@@ -862,6 +862,24 @@ const saveManualTurn = () => {
     
     showManualTurnModal.value = false
     alert('Turno asignado correctamente')
+}
+
+const testGemini = async () => {
+  if (!botKnowledge.value.geminiKey) return
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${botKnowledge.value.geminiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: "Hola, responde solo 'OK' si recibes esto." }] }]
+      })
+    })
+    const data = await response.json()
+    if (data.candidates) alert('✅ ¡Conexión con Gemini Exitosa!')
+    else alert('❌ Error en la clave: ' + JSON.stringify(data.error || data))
+  } catch (err) {
+    alert('❌ Error de red: ' + err.message)
+  }
 }
 </script>
 
