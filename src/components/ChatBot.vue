@@ -320,6 +320,46 @@ const processIntent = (input, forceAction = null) => {
   return { text: response, options: nextOpts }
 }
 
+// --- INTELLIGENT AI (Gemini) ---
+const callGeminiAI = async (userText) => {
+  if (!botKnowledge.value.geminiKey) return null
+
+  const clinicContext = `
+    Eres la asistente virtual del "Centro Odontológico Integral Dra. Adriana Pagnotta".
+    Información de la clínica:
+    - Dirección: ${siteConfig.value.address}
+    - Horarios: ${siteConfig.value.hours}
+    - Contacto: ${siteConfig.value.phoneFixed}, WhatsApp: ${siteConfig.value.phoneMobile}
+    - Servicios: ${allServices.value.map(s => s.title).join(', ')}
+    - Bio Chatbot: ${botKnowledge.value.welcome}
+    - Info Obras Sociales: ${botKnowledge.value.insuranceInfo}
+
+    Instrucciones:
+    1. Responde de forma cálida, profesional y empática. Muchos pacientes tienen miedo.
+    2. Usa la información de arriba para responder.
+    3. Si el usuario quiere un turno, dile que puede usar el botón "Reservar Cita" o pedirlo por aquí (identificándose con su DNI).
+    4. Nunca des diagnósticos médicos, solo información general.
+    5. No menciones que eres una IA a menos que te pregunten. Eres la asistente de la Dra. Adriana.
+  `
+
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${botKnowledge.value.geminiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: `Contexto: ${clinicContext}\n\nUsuario dice: ${userText}` }]
+        }]
+      })
+    })
+    const data = await response.json()
+    return data.candidates[0].content.parts[0].text
+  } catch (err) {
+    console.error("Gemini Error:", err)
+    return null
+  }
+}
+
 // --- LÓGICA DE REGISTRO PASO A PASO ---
 const handleRegistration = (text) => {
   let response = ""
@@ -432,7 +472,7 @@ const handleRegistration = (text) => {
 }
 
 // --- MANEJO DE USUARIO ACTIVO (Turnos, Consultas) ---
-const handleActiveUserFlow = (text, forceAction) => {
+const handleActiveUserFlow = async (text, forceAction) => {
   const state = bookingState.value
   const user = state.extractedUser
   const lower = text.toLowerCase()
@@ -548,10 +588,16 @@ const handleActiveUserFlow = (text, forceAction) => {
       return { text: "Sí, ya te tengo identificado en el sistema. ¿Querés sacar un turno?", options: [{ label: '📅 Sí, Reservar', action: 'turno' }] }
   }
 
+  // Si no es una acción de turno ni cancelar, preguntamos a Gemini
+  if (!forceAction && !state.serviceMode && !state.cancelMode) {
+      const aiResponse = await callGeminiAI(text)
+      if (aiResponse) return { text: aiResponse, options: defaultOptions }
+  }
+
   return processIntent(text, forceAction)
 }
 
-const sendMessage = (e, forceAction = null) => {
+const sendMessage = async (e, forceAction = null) => {
   const text = userInput.value.trim()
   if (!text && !forceAction) return
 
@@ -574,7 +620,7 @@ const sendMessage = (e, forceAction = null) => {
     } 
     // 2. USUARIO ACTIVO (Logged in)
     else if (bookingState.value.active) {
-       result = handleActiveUserFlow(text, forceAction)
+       result = await handleActiveUserFlow(text, forceAction)
     }
     // 3. VISITANTE (Detectar DNI o Intención General)
     else {
@@ -603,8 +649,17 @@ const sendMessage = (e, forceAction = null) => {
               }
           }
       } else {
-          // Procesamiento NLP normal
-          result = processIntent(text, forceAction)
+          // Procesamiento Inteligente con Gemini o Local
+          if (!forceAction) {
+             const aiResponse = await callGeminiAI(text)
+             if (aiResponse) {
+                result = { text: aiResponse, options: defaultOptions }
+             } else {
+                result = processIntent(text, forceAction)
+             }
+          } else {
+             result = processIntent(text, forceAction)
+          }
       }
     }
     

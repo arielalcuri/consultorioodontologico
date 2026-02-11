@@ -324,6 +324,27 @@
       <!-- ChatBot Config Tab -->
       <section v-if="currentTab === 'chatbot'" class="tab-content">
         <div class="chatbot-admin-container">
+          <!-- Gemini Config -->
+          <div class="admin-card mb-8 border-2 border-purple-100 bg-purple-50">
+            <div class="card-header bg-purple-100">
+              <i class="fas fa-magic"></i>
+              <h3>Cerebro de IA Avanzada (Google Gemini)</h3>
+            </div>
+            <div class="p-6">
+              <p class="mb-4 text-sm text-slate-600">
+                Conecta tu chatbot con <strong>Google Gemini</strong> para que pueda responder dudas complejas de forma natural. 
+                <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-purple-600 font-bold underline ml-1">Obten tu clave GRATIS aquí</a>.
+              </p>
+              <div class="form-group">
+                <label>API KEY de Google Gemini</label>
+                <div class="flex gap-2">
+                  <input v-model="botKnowledge.geminiKey" type="password" class="input-modern" placeholder="Pega tu clave AIzaSy..." style="flex: 1;">
+                  <button @click="testGemini" class="btn btn-secondary btn-sm" :disabled="!botKnowledge.geminiKey">Probar Conexión</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="admin-card mb-8">
             <div class="card-header">
               <i class="fas fa-brain"></i>
