@@ -16,7 +16,7 @@
         </button>
       </nav>
       <button class="logout-btn" @click="handleLogout">
-        <i class="fas fa-sign-out-alt"></i> Cerrar SesiÃƒÆ’Ã‚Â³n
+        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
       </button>
     </aside>
 
@@ -211,10 +211,31 @@
       <!-- Web Config Tab -->
       <section v-if="currentTab === 'web'" class="tab-content">
         <div class="chatbot-admin-container">
+          <div class="admin-card mb-8 border-2 border-cyan-100 bg-cyan-50">
+            <div class="card-header bg-cyan-100">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <h3>Sincronización Cloud (Firebase)</h3>
+            </div>
+            <div class="p-6">
+              <p class="mb-4 text-sm text-slate-600">
+                Usa este panel para subir tus cambios locales (servicios, fotos, chatbot) a la base de datos oficial de Firebase.
+              </p>
+              <div class="flex gap-4">
+                <button @click="syncToCloud" class="btn btn-primary" :disabled="isSyncing">
+                  <i class="fas fa-sync" :class="{ 'fa-spin': isSyncing }"></i> 
+                  {{ isSyncing ? 'Sincronizando...' : 'Sincronizar Todo con Cloud' }}
+                </button>
+                <button @click="initializeCloudData" class="btn btn-secondary" :disabled="isSyncing">
+                  <i class="fas fa-magic"></i> Inicializar con Contenido Profesional
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div class="admin-card mb-8">
             <div class="card-header">
               <i class="fas fa-image"></i>
-              <h3>ImÃƒÆ’Ã‚Â¡genes del Sitio</h3>
+              <h3>Imágenes del Sitio</h3>
             </div>
             <div class="p-6">
               <div class="chatbot-config-grid">
@@ -557,9 +578,58 @@
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { allTurnos, updateTurno, deleteTurno, addTurno, allUsers, updateUser, deleteUser, allServices, addService, updateService, deleteService, botKnowledge, siteConfig } from '../store'
+import { db } from '../firebase'
+import { doc, setDoc } from 'firebase/firestore'
 
 const router = useRouter()
 const currentTab = ref('agenda')
+const isSyncing = ref(false)
+
+const syncToCloud = async () => {
+  if (!confirm('¿Quieres subir todos los cambios de diseño y configuración a la nube (Firebase)? Esto actualizará lo que ven los pacientes.')) return
+  
+  isSyncing.value = true
+  try {
+    await setDoc(doc(db, 'config', 'site'), siteConfig.value)
+    await setDoc(doc(db, 'config', 'chatbot'), botKnowledge.value)
+    await setDoc(doc(db, 'config', 'services'), { list: allServices.value })
+    
+    alert('✅ ¡Sincronización Exitosa! El sitio web oficial ha sido actualizado con tus cambios.')
+  } catch (err) {
+    console.error('Sync error:', err)
+    alert('❌ Error al sincronizar: ' + err.message)
+  } finally {
+    isSyncing.value = false
+  }
+}
+
+const initializeCloudData = async () => {
+  if (!confirm('¿Deseas inicializar la base de datos con el contenido profesional predeterminado?')) return
+  
+  isSyncing.value = true
+  try {
+     const defaultProfServices = [
+        { id: 1, title: 'Estética Dental', description: 'Carillas, coronas de porcelana y diseño de sonrisa con resultados naturales.', icon: 'fas fa-gem', image: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?q=80&w=1000&auto=format&fit=crop' },
+        { id: 2, title: 'Ortodoncia', description: 'Brackets metálicos, cerámicos y zafiro para niños y adultos.', icon: 'fas fa-teeth-open', image: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?q=80&w=1000&auto=format&fit=crop' },
+        { id: 3, title: 'Implantes', description: 'Reposición dental con tecnología de alta precisión y biocompatibilidad.', icon: 'fas fa-shapes', image: 'https://images.unsplash.com/photo-1593054174034-78330547000e?q=80&w=1000&auto=format&fit=crop' },
+        { id: 4, title: 'Endodoncia', description: 'Tratamientos de conducto avanzados, rápidos y sin dolor.', icon: 'fas fa-microscope', image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1000&auto=format&fit=crop' },
+        { id: 5, title: 'Prótesis', description: 'Soluciones fijas y removibles que devuelven la función y estética.', icon: 'fas fa-user-md', image: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?q=80&w=1000&auto=format&fit=crop' }
+     ]
+
+     allServices.value = defaultProfServices
+     
+     // Sincronizamos las 3 colecciones principales de configuración
+     await setDoc(doc(db, 'config', 'site'), siteConfig.value)
+     await setDoc(doc(db, 'config', 'chatbot'), botKnowledge.value)
+     await setDoc(doc(db, 'config', 'services'), { list: allServices.value })
+     
+     alert('✨ Base de datos inicializada con servicios profesionales.')
+  } catch (err) {
+    alert('Error: ' + err.message)
+  } finally {
+    isSyncing.value = false
+  }
+}
 // const selectedDay = ref(null) (Removed duplicate declaration)
 
 // Asegurar inicializaciÃƒÆ’Ã‚Â³n de FAQs si el localstorage estaba corrupto

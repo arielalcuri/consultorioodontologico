@@ -89,6 +89,8 @@
 <script setup>
 import { ref, onMounted, nextTick, watch } from 'vue'
 import { allServices, botKnowledge, findUserByDetails, addTurno, allTurnos, deleteTurno, registerUser } from '../store'
+import { db } from '../firebase'
+import { doc, getDoc } from 'firebase/firestore'
 
 const isOpen = ref(false)
 const userInput = ref('')
@@ -112,9 +114,19 @@ const getTime = () => {
   return now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0')
 }
 
-onMounted(() => {
+onMounted(async () => {
   currentOptions.value = defaultOptions
   setTimeout(() => showBadge.value = false, 5000)
+
+  // Cargar conocimiento del bot desde Firebase
+  try {
+    const botSnap = await getDoc(doc(db, 'config', 'chatbot'))
+    if (botSnap.exists()) {
+      Object.assign(botKnowledge.value, botSnap.data())
+    }
+  } catch (err) {
+    console.warn('Usando configuración local para el ChatBot')
+  }
 })
 
 const handleOptionClick = (opt) => {

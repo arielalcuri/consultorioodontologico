@@ -58,7 +58,7 @@
             Tu sonrisa merece el cuidado de <span class="highlight-text">Expertos</span>
           </h1>
           <p class="hero-subtitle">
-            Brindamos una atenciï¿½fÂ³n dedicada y un trato humano excepcional en Villa Lugano.
+            Brindamos una atención dedicada y un trato humano excepcional en Villa Lugano.
             Resultados naturales que priorizan tu salud y bienestar.
           </p>
           <div class="hero-buttons">
@@ -282,7 +282,9 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import ChatBot from '../components/ChatBot.vue'
-import { allServices, addTurno, registerUser, siteConfig } from '../store'
+import { allServices, addTurno, registerUser, siteConfig, botKnowledge } from '../store'
+import { db } from '../firebase'
+import { doc, getDoc } from 'firebase/firestore'
 
 const scrollY = ref(0)
 const mobileMenuOpen = ref(false)
@@ -313,9 +315,10 @@ const fetchFeriados = async () => {
 
 const updateScroll = () => { scrollY.value = window.scrollY }
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener('scroll', updateScroll)
   fetchFeriados()
+  
   // SociableKit Script Injection
   const scriptId = 'SociableKitScript'
   if (!document.getElementById(scriptId)) {
@@ -325,24 +328,30 @@ onMounted(() => {
     js.defer = true
     document.head.appendChild(js)
   }
+
+  // Cargar datos desde Firebase para asegurar que los pacientes vean lo último editado
+  try {
+    const siteSnap = await getDoc(doc(db, 'config', 'site'))
+    if (siteSnap.exists()) {
+      Object.assign(siteConfig.value, siteSnap.data())
+    }
+    
+    const servSnap = await getDoc(doc(db, 'config', 'services'))
+    if (servSnap.exists() && servSnap.data().list) {
+      allServices.value = servSnap.data().list
+    }
+
+    const botSnap = await getDoc(doc(db, 'config', 'chatbot'))
+    if (botSnap.exists()) {
+      Object.assign(botKnowledge.value, botSnap.data())
+    }
+  } catch (err) {
+    console.warn('Usando datos locales:', err)
+  }
 })
 onUnmounted(() => window.removeEventListener('scroll', updateScroll))
 
-const config = {
-  address: 'Cosquï¿½fÂ­n 4809, Villa Lugano, CABA',
-  hours: 'Martes y Jueves de 15:30 a 20:00hs',
-  phoneFixed: '4601-8957',
-  phoneMobile: '1130019567'
-}
-
-const services = [
-  { title: 'Estï¿½fÂ©tica', description: 'Carillas, coronas y diseï¿½fÂ±o de sonrisa.', icon: 'fas fa-gem' },
-  { title: 'Ortodoncia', description: 'Brackets metï¿½fÂ¡licos, cerï¿½fÂ¡micos y zafiro.', icon: 'fas fa-teeth-open' },
-  { title: 'Implantes', description: 'Reposiciï¿½fÂ³n dental con tecnologï¿½fÂ­a de punta.', icon: 'fas fa-shapes' },
-  { title: 'Endodoncia', description: 'Tratamiento de conducto avanzado.', icon: 'fas fa-microscope' },
-  { title: 'Periodoncia', description: 'Cuidado especializado de encï¿½fÂ­as.', icon: 'fas fa-hand-holding-medical' },
-  { title: 'Odontopediatrï¿½fÂ­a', description: 'Atenciï¿½fÂ³n dental kids con cariï¿½fÂ±o.', icon: 'fas fa-child' }
-]
+// Los datos de config y servicios ahora se manejan centralizadamente en store.js y se sincronizan con Firestore
 
 const form = ref({
   lastName: '', firstName: '', dni: '', birthDate: '',
