@@ -103,7 +103,6 @@
         <div v-if="selectedDay" class="day-details mt-8 slide-up">
           <div class="details-header">
             <h4>Turnos para el {{ selectedDay }}/{{ currentMonth + 1 }}/{{ currentYear }}</h4>
-            <h4>Turnos para el {{ selectedDay }}/{{ currentMonth + 1 }}/{{ currentYear }}</h4>
             <div style="display: flex; gap: 10px;">
               <button @click="openManualTurnModal" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Asignar Turno</button>
               <button @click="selectedDay = null" class="btn-close-details">&times;</button>

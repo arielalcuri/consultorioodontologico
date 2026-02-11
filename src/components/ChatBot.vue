@@ -610,7 +610,7 @@ const sendMessage = async (e, forceAction = null) => {
   isTyping.value = true
   scrollToBottom()
 
-  setTimeout(() => {
+  setTimeout(async () => {
     let result = { text: "", options: [] }
 
     // 1. MODO REGISTRO (Prioridad Alta)
