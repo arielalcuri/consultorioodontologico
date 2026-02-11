@@ -36,7 +36,7 @@
     <!-- Mobile Menu Panel -->
     <div class="mobile-menu" :class="{ 'active': menuOpen }">
       <button class="close-menu-btn" @click="menuOpen = false">
-        Ã¢ï¿½"ï¿½?ï¿½
+        &times;
       </button>
       <div class="mobile-links">
         <a href="#inicio" @click="menuOpen = false">Inicio</a>
@@ -71,7 +71,7 @@
             <i class="fas fa-check-circle"></i>
             <span>Implantes Certificados</span>
           </div>
-          <img :src="siteConfig.heroImage" alt="Clï¿½fÂ­nica" class="main-hero-img">
+          <img :src="siteConfig.heroImage" alt="Clínica" class="main-hero-img">
         </div>
       </div>
     </section>
@@ -118,17 +118,17 @@
         <div class="image-side">
           <div class="exp-badge shadow-pulse">
             <span class="num">30+</span>
-            <span class="txt">Aï¿½fÂ±os de <br>Trayectoria <br><strong>Profesional</strong></span>
+            <span class="txt">Años de <br>Trayectoria <br><strong>Profesional</strong></span>
           </div>
           <img :src="siteConfig.aboutImage" alt="Profesional" class="about-img">
         </div>
         <div class="text-side">
           <span class="tag">Sobre Nosotros</span>
-          <h2 class="section-title"><span class="highlight-text">Cercanï¿½fÂ­a</span></h2>
-          <p class="about-p">En el Centro Odontológico Integral, brindamos una atenciï¿½fÂ³n personalizada enfocada en la salud y el bienestar integral de cada paciente.</p>
+          <h2 class="section-title"><span class="highlight-text">Cercanía</span></h2>
+          <p class="about-p">En el Centro Odontológico Integral, brindamos una atención personalizada enfocada en la salud y el bienestar integral de cada paciente.</p>
           <ul class="feature-checks">
-            <li><i class="fas fa-check-circle"></i> <span>Atenciï¿½fÂ³n dedicada Martes y Jueves</span></li>
-            <li><i class="fas fa-check-circle"></i> <span>Ubicaciï¿½fÂ³n privilegiada en Villa Lugano</span></li>
+            <li><i class="fas fa-check-circle"></i> <span>Atención dedicada Martes y Jueves</span></li>
+            <li><i class="fas fa-check-circle"></i> <span>Ubicación privilegiada en Villa Lugano</span></li>
           </ul>
         </div>
       </div>
@@ -261,7 +261,7 @@
 
           <div class="form-group">
             <label>Motivo de consulta</label>
-            <textarea v-model="form.details" rows="3" placeholder="Cuï¿½fÂ©ntenos brevemente quï¿½fÂ© le sucede..."></textarea>
+            <textarea v-model="form.details" rows="3" placeholder="Cuéntenos brevemente qué le sucede..."></textarea>
           </div>
 
           <button type="submit" class="btn btn-primary btn-full" :disabled="submitting || !isTuTh">
@@ -371,7 +371,7 @@ const closeBookingModal = () => {
 const isTuTh = computed(() => {
   if (!form.value.selectedDate) return true
   
-  // 1. Validar si la fecha existe fï¿½fÂ­sicamente (ej: 29 de febrero en aï¿½fÂ±os no bisiestos)
+  // 1. Validar si la fecha existe físicamente (ej: 29 de febrero en años no bisiestos)
   const parts = form.value.selectedDate.split('-')
   const y = parseInt(parts[0])
   const m = parseInt(parts[1])
@@ -396,7 +396,7 @@ const submitBooking = async () => {
   if (!isTuTh.value) return
   submitting.value = true
   
-  // Registrar al usuario automï¿½fÂ¡ticamente si no existe para que el ChatBot lo reconozca
+  // Registrar al usuario automáticamente si no existe para que el ChatBot lo reconozca
   registerUser({
     name: form.value.firstName,
     lastName: form.value.lastName,

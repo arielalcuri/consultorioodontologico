@@ -138,7 +138,7 @@
               </tbody>
             </table>
           </div>
-          <p v-else class="no-turns-msg">No hay turnos confirmados para este dÃƒÆ’Ã‚Â­a.</p>
+          <p v-else class="no-turns-msg">No hay turnos confirmados para este día.</p>
         </div>
       </section>
 
@@ -188,8 +188,8 @@
             <thead>
               <tr>
                 <th>Icono</th>
-                <th>TÃƒÆ’Ã‚Â­tulo</th>
-                <th>DescripciÃƒÆ’Ã‚Â³n</th>
+                <th>Título</th>
+                <th>Descripción</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -271,7 +271,7 @@
               <div class="faq-management-list">
                 <div v-for="(faq, index) in siteConfig.faqs" :key="faq.id" class="faq-editor-card">
                   <div class="faq-editor-main">
-                    <input v-model="faq.q" placeholder="Pregunta (Ej: Ãƒâ€šÃ‚Â¿Tienen WiFi?)" class="input-modern mb-2">
+                    <input v-model="faq.q" placeholder="Pregunta (Ej: ¿Tienen WiFi?)" class="input-modern mb-2">
                     <textarea v-model="faq.a" placeholder="Respuesta..." rows="2" class="input-modern"></textarea>
                   </div>
                   <div class="faq-editor-side">
@@ -284,10 +284,10 @@
             <div class="card-header flex justify-between items-center">
               <div class="flex items-center gap-2">
                 <i class="fas fa-star"></i>
-                <h3>ReseÃƒÆ’Ã‚Â±as / Testimonios</h3>
+                <h3>Reseñas / Testimonios</h3>
               </div>
               <button @click="siteConfig.reviews.unshift({ id: Date.now(), name: '', stars: 5, text: '', date: 'Hace 1 mes' })" class="btn btn-primary btn-sm">
-                <i class="fas fa-plus"></i> Nueva ReseÃƒÆ’Ã‚Â±a
+                <i class="fas fa-plus"></i> Nueva Reseña
               </button>
             </div>
             <div class="p-6">
@@ -297,9 +297,9 @@
                        <div class="form-row mb-2">
                           <input v-model="review.name" placeholder="Nombre (Ej: Juan Perez)" class="input-modern">
                           <select v-model="review.stars" class="input-modern">
-                             <option :value="5">ÃƒÂ¢Ã‚Â­Ã‚ÂÃƒÂ¢Ã‚Â­Ã‚ÂÃƒÂ¢Ã‚Â­Ã‚ÂÃƒÂ¢Ã‚Â­Ã‚ÂÃƒÂ¢Ã‚Â­Ã‚Â 5 Estrellas</option>
-                             <option :value="4">ÃƒÂ¢Ã‚Â­Ã‚ÂÃƒÂ¢Ã‚Â­Ã‚ÂÃƒÂ¢Ã‚Â­Ã‚ÂÃƒÂ¢Ã‚Â­Ã‚Â 4 Estrellas</option>
-                             <option :value="3">ÃƒÂ¢Ã‚Â­Ã‚ÂÃƒÂ¢Ã‚Â­Ã‚ÂÃƒÂ¢Ã‚Â­Ã‚Â 3 Estrellas</option>
+                             <option :value="5">⭐⭐⭐⭐⭐ 5 Estrellas</option>
+                             <option :value="4">⭐⭐⭐⭐ 4 Estrellas</option>
+                             <option :value="3">⭐⭐⭐ 3 Estrellas</option>
                           </select>
                        </div>
                        <input v-model="review.date" placeholder="Fecha (Ej: Hace 2 semanas)" class="input-modern mb-2">
@@ -340,11 +340,11 @@
                   <textarea v-model="botKnowledge.insuranceInfo" rows="2" class="input-modern"></textarea>
                 </div>
                 <div class="form-group">
-                  <label>InformaciÃƒÆ’Ã‚Â³n de Turnos</label>
+                  <label>Información de Turnos</label>
                   <textarea v-model="botKnowledge.appointmentInfo" rows="3" class="input-modern"></textarea>
                 </div>
                 <div class="form-group">
-                  <label>InformaciÃƒÆ’Ã‚Â³n de Contacto</label>
+                  <label>Información de Contacto</label>
                   <textarea v-model="botKnowledge.contactInfo" rows="2" class="input-modern"></textarea>
                 </div>
                 <div class="form-group full-width">
@@ -368,7 +368,7 @@
             <div class="p-6">
               <div v-if="botKnowledge.faqs.length === 0" class="no-data-msg">
                 <i class="fas fa-robot mb-3" style="font-size: 2rem; display: block; opacity: 0.3;"></i>
-                No hay preguntas personalizadas aÃƒÆ’Ã‚Âºn.<br>Agrega una para que la IA aprenda sobre tu consultorio.
+                No hay preguntas personalizadas aún.<br>Agrega una para que la IA aprenda sobre tu consultorio.
               </div>
               <div class="faq-management-list">
                 <div v-for="(faq, index) in (botKnowledge.faqs || [])" :key="index" class="faq-editor-card">
@@ -378,8 +378,8 @@
                       <input v-model="faq.q" placeholder="Ej: WiFi, estacionamiento, tarjetas..." class="input-modern">
                     </div>
                     <div class="faq-input-group mt-4">
-                      <label>La IA responderÃƒÆ’Ã‚Â¡:</label>
-                      <textarea v-model="faq.a" placeholder="Escribe la respuesta que darÃƒÆ’Ã‚Â¡ el asistente virtual..." rows="2" class="input-modern"></textarea>
+                      <label>La IA responderá:</label>
+                      <textarea v-model="faq.a" placeholder="Escribe la respuesta que dará el asistente virtual..." rows="2" class="input-modern"></textarea>
                     </div>
                   </div>
                   <div class="faq-editor-side">
@@ -394,7 +394,7 @@
           </div>
 
           <div class="save-status-floating" v-if="showSaveAlert">
-            <i class="fas fa-check-circle"></i> Cambios guardados automÃƒÆ’Ã‚Â¡ticamente
+            <i class="fas fa-check-circle"></i> Cambios guardados automáticamente
           </div>
         </div>
       </section>
@@ -453,10 +453,10 @@
               <div class="form-group"><label>DNI *</label><input v-model="newUserForm.dni" required></div>
               <div class="form-group"><label>F. Nacimiento *</label><input v-model="newUserForm.birthDate" type="date" required></div>
             </div>
-            <div class="form-group"><label>Domicilio (Calle, NÃƒâ€šÃ‚Â°, Localidad) *</label><input v-model="newUserForm.address" placeholder="Ej: Av. Rivadavia 1234, Ramos MejÃƒÆ’Ã‚Â­a" required></div>
-            <div class="form-group"><label>TelÃƒÆ’Ã‚Â©fono *</label><input v-model="newUserForm.phone" required></div>
+            <div class="form-group"><label>Domicilio (Calle, N°, Localidad) *</label><input v-model="newUserForm.address" placeholder="Ej: Av. Rivadavia 1234, Ramos Mejía" required></div>
+            <div class="form-group"><label>Teléfono *</label><input v-model="newUserForm.phone" required></div>
             <div class="form-group"><label>Email (Opcional)</label><input v-model="newUserForm.email" type="email" autocomplete="email"></div>
-            <div class="form-group"><label>ContraseÃƒÆ’Ã‚Â±a *</label><input v-model="newUserForm.password" type="password" required autocomplete="current-password"></div>
+            <div class="form-group"><label>Contraseña *</label><input v-model="newUserForm.password" type="password" required autocomplete="current-password"></div>
             <button type="submit" class="btn btn-primary btn-full">Registrar Paciente</button>
          </form>
        </div>
@@ -472,7 +472,7 @@
               <div class="form-group"><label>Apellido</label><input v-model="editUserForm.lastName"></div>
             </div>
             <div class="form-group"><label>Email</label><input v-model="editUserForm.email" disabled autocomplete="username"></div>
-            <div class="form-group"><label>Nueva Clave (opcional)</label><input v-model="editUserForm.password" type="password" placeholder="Nueva contraseÃƒÆ’Ã‚Â±a" autocomplete="new-password"></div>
+            <div class="form-group"><label>Nueva Clave (opcional)</label><input v-model="editUserForm.password" type="password" placeholder="Nueva contraseña" autocomplete="new-password"></div>
             <button type="submit" class="btn btn-primary btn-full">Guardar</button>
          </form>
        </div>
@@ -482,8 +482,8 @@
        <div class="modal-content admin-modal scale-in">
          <h3>Servicio</h3>
          <form @submit.prevent="saveService" class="edit-form mt-4">
-            <div class="form-group"><label>TÃƒÆ’Ã‚Â­tulo</label><input v-model="serviceForm.title"></div>
-            <div class="form-group"><label>DescripciÃƒÆ’Ã‚Â³n</label><input v-model="serviceForm.description"></div>
+            <div class="form-group"><label>Título</label><input v-model="serviceForm.title"></div>
+            <div class="form-group"><label>Descripción</label><input v-model="serviceForm.description"></div>
             <div class="form-group"><label>Icono (FA)</label><input v-model="serviceForm.icon"></div>
             <button type="submit" class="btn btn-primary btn-full">Guardar</button>
          </form>
@@ -529,10 +529,10 @@
                 <div class="form-group"><label>DNI *</label><input v-model="newUserForm.dni" required></div>
                 <div class="form-group"><label>F. Nac *</label><input v-model="newUserForm.birthDate" type="date" required></div>
               </div>
-              <div class="form-group"><label>Domicilio *</label><input v-model="newUserForm.address" placeholder="Calle, NÃƒâ€šÃ‚Â°, Localidad" required></div>
-              <div class="form-group"><label>TelÃƒÆ’Ã‚Â©fono *</label><input v-model="newUserForm.phone" required></div>
+              <div class="form-group"><label>Domicilio *</label><input v-model="newUserForm.address" placeholder="Calle, N°, Localidad" required></div>
+              <div class="form-group"><label>Teléfono *</label><input v-model="newUserForm.phone" required></div>
               <div class="form-group"><label>Email (Opcional)</label><input v-model="newUserForm.email" type="email"></div>
-              <div class="form-group"><label>ContraseÃƒÆ’Ã‚Â±a *</label><input v-model="newUserForm.password" type="password" required></div>
+              <div class="form-group"><label>Contraseña *</label><input v-model="newUserForm.password" type="password" required></div>
               
               <div class="form-actions mt-4 flex gap-2">
                  <button type="button" @click="manualTurnStep = 1" class="btn-secondary" style="flex:1">Volver</button>
@@ -632,7 +632,7 @@ const initializeCloudData = async () => {
 }
 // const selectedDay = ref(null) (Removed duplicate declaration)
 
-// Asegurar inicializaciÃƒÆ’Ã‚Â³n de FAQs si el localstorage estaba corrupto
+// Asegurar inicialización de FAQs si el localstorage estaba corrupto
 if (!botKnowledge.value.faqs) {
   botKnowledge.value.faqs = []
 }
@@ -640,13 +640,13 @@ if (!botKnowledge.value.faqs) {
 // Calendar State
 const now = new Date()
 const currentMonth = ref(now.getMonth())
+// Auto-seleccionar el día de hoy al cargar
+const selectedDay = ref(now.getDate())
 const currentYear = ref(now.getFullYear())
 
-// Auto-seleccionar el dÃƒÆ’Ã‚Â­a de hoy al cargar
-const selectedDay = ref(now.getDate())
-
+const initialDay = ref(now.getDate())
 const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
-const weekDays = ["Dom", "Lun", "Mar", "MiÃƒÆ’Ã‚Â©", "Jue", "Vie", "SÃƒÆ’Ã‚Â¡b"]
+const weekDays = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
 
 // Modal States
 const showConfirmModal = ref(false)
@@ -684,7 +684,7 @@ const confirmedTurnos = computed(() => allTurnos.value.filter(t => t.status === 
 const daysInMonth = computed(() => new Date(currentYear.value, currentMonth.value + 1, 0).getDate())
 const startDayOffset = computed(() => new Date(currentYear.value, currentMonth.value, 1).getDay())
 
-// Helper para saber si un dÃƒÆ’Ã‚Â­a ya pasÃƒÆ’Ã‚Â³
+// Helper para saber si un día ya pasó
 const isPastDay = (day) => {
   const checkDate = new Date(currentYear.value, currentMonth.value, day)
   const today = new Date()
@@ -736,7 +736,7 @@ const openConfirmModal = (turno) => { selectedTurno.value = turno; assignedTime.
 const confirmTurno = () => { updateTurno(selectedTurno.value.id, { status: 'confirmado', assignedTime: assignedTime.value }); showConfirmModal.value = false; }
 const openEditModal = (turno) => { selectedTurno.value = turno; editForm.value = { ...turno }; showEditModal.value = true; }
 const saveEdit = () => { updateTurno(selectedTurno.value.id, editForm.value); showEditModal.value = false; }
-const handleDelete = (id) => { if (confirm('Ãƒâ€šÃ‚Â¿Eliminar turno?')) deleteTurno(id) }
+const handleDelete = (id) => { if (confirm('¿Eliminar turno?')) deleteTurno(id) }
 
 const openEditUserModal = (user) => { editUserForm.value = { ...user }; showEditUserModal.value = true; }
 const openNewUserModal = () => { newUserForm.value = { name: '', lastName: '', dni: '', email: '', phone: '', birthDate: '', password: 'admin' }; showNewUserModal.value = true; }
@@ -746,7 +746,7 @@ const saveNewUser = () => {
   alert('Paciente registrado exitosamente en LocalStorage');
 }
 const saveUserEdit = () => { updateUser(editUserForm.value.email, editUserForm.value); showEditUserModal.value = false; }
-const handleDeleteUser = (email) => { if (confirm('Ãƒâ€šÃ‚Â¿Eliminar usuario?')) deleteUser(email) }
+const handleDeleteUser = (email) => { if (confirm('¿Eliminar usuario?')) deleteUser(email) }
 
 const openNewServiceModal = () => { isEditingService.value = false; serviceForm.value = { title: '', description: '', icon: 'fas fa-tooth' }; showServiceModal.value = true; }
 const openEditServiceModal = (service) => { isEditingService.value = true; serviceForm.value = { ...service }; showServiceModal.value = true; }
@@ -759,7 +759,7 @@ const handleDeleteService = (id) => { if (confirm('Ãƒâ€šÃ‚Â¿Eliminar 
 
 const showSaveAlert = ref(false)
 const confirmDeleteFaq = (index) => {
-  if (confirm('Ãƒâ€šÃ‚Â¿EstÃƒÆ’Ã‚Â¡s seguro de que deseas eliminar esta pregunta? El ChatBot dejarÃƒÆ’Ã‚Â¡ de responderla inmediatamente.')) {
+  if (confirm('¿Estás seguro de que deseas eliminar esta pregunta? El ChatBot dejará de responderla inmediatamente.')) {
     botKnowledge.value.faqs.splice(index, 1)
   }
 }
