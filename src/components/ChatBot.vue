@@ -353,7 +353,10 @@ const callGeminiAI = async (userText) => {
       })
     })
     const data = await response.json()
-    return data.candidates[0].content.parts[0].text
+    if (data.candidates && data.candidates.length > 0) {
+      return data.candidates[0].content.parts[0].text
+    }
+    return null
   } catch (err) {
     console.error("Gemini Error:", err)
     return null
