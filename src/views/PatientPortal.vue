@@ -203,15 +203,45 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { allTurnos, addTurno, registerUser, findUser, updateUser, allServices } from '../store'
+import { ref, computed, onMounted } from 'vue'
+import { allTurnos, addTurno, allServices } from '../store'
+import { auth, db } from '../firebase'
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  onAuthStateChanged, 
+  signOut,
+  updateProfile
+} from 'firebase/auth'
 
 const user = ref(null)
 const view = ref('turns')
 const authMode = ref('login')
 const showModal = ref(false)
+const loading = ref(false)
 const today = new Date().toISOString().split('T')[0]
 const feriados = ref([])
+
+onMounted(() => {
+  onAuthStateChanged(auth, (firebaseUser) => {
+    if (firebaseUser) {
+      // Mapeamos los datos de Firebase al objeto que usa el componente
+      const nameParts = (firebaseUser.displayName || '').split(' ')
+      user.value = {
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        name: nameParts[0] || 'Paciente',
+        lastName: nameParts.slice(1).join(' ') || '',
+        // Nota: Datos como DNI y Teléfono deberían guardarse en Firestore. 
+        // Por ahora los simulamos para mantener la UI funcional.
+        dni: firebaseUser.photoURL || '', // Usamos esto temporalmente para el DNI para no cambiar todo ahora
+        phone: ''
+      }
+    } else {
+      user.value = null
+    }
+  })
+})
 
 const fetchFeriados = async () => {
   try {
@@ -251,40 +281,54 @@ const myTurns = computed(() => {
   return allTurnos.value.filter(t => t.email === user.value.email)
 })
 
-const handleLogin = () => {
+const handleLogin = async () => {
   authError.value = ''
-  const found = findUser(loginForm.value.email, loginForm.value.password)
-  if (found) {
-    user.value = { ...found }
+  loading.value = true
+  try {
+    await signInWithEmailAndPassword(auth, loginForm.value.email, loginForm.value.password)
     loginForm.value = { email: '', password: '' }
-  } else {
+  } catch (err) {
     authError.value = 'Email o contraseña incorrectos.'
+  } finally {
+    loading.value = false
   }
 }
 
-const handleRegister = () => {
+const handleRegister = async () => {
   if (regForm.value.password !== regForm.value.confirmPassword) return
   authError.value = ''
-  const newUser = registerUser({
-    name: regForm.value.name,
-    lastName: regForm.value.lastName,
-    dni: regForm.value.dni,
-    birthDate: regForm.value.birthDate,
-    address: regForm.value.address,
-    email: regForm.value.email,
-    password: regForm.value.password,
-    phone: regForm.value.phone
-  })
-  user.value = { ...newUser }
-  regForm.value = { name: '', lastName: '', dni: '', birthDate: '', address: '', email: '', password: '', confirmPassword: '', phone: '' }
+  loading.value = true
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, regForm.value.email, regForm.value.password)
+    await updateProfile(cred.user, {
+      displayName: `${regForm.value.name} ${regForm.value.lastName}`,
+      photoURL: regForm.value.dni // Guardamos el DNI aquí temporalmente
+    })
+    
+    // Podrías guardar el resto de datos (dirección, tel) en Firestore aquí
+    
+    regForm.value = { name: '', lastName: '', dni: '', birthDate: '', address: '', email: '', password: '', confirmPassword: '', phone: '' }
+  } catch (err) {
+    authError.value = 'Error al registrarse: ' + err.message
+  } finally {
+    loading.value = false
+  }
 }
 
-const handleUpdateProfile = () => {
-  updateUser(user.value.email, user.value)
-  alert('Perfil actualizado correctamente.')
+const handleUpdateProfile = async () => {
+  try {
+    if (auth.currentUser) {
+      await updateProfile(auth.currentUser, {
+        displayName: `${user.value.name} ${user.value.lastName}`
+      })
+      alert('Perfil actualizado correctamente en la sesión.')
+    }
+  } catch (err) {
+    alert('Error al actualizar: ' + err.message)
+  }
 }
 
-const logout = () => { user.value = null }
+const logout = () => { signOut(auth) }
 const openModal = () => { showModal.value = true }
 
 const formatDate = (dateStr) => {

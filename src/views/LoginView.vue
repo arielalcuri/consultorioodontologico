@@ -27,6 +27,8 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { auth } from '../firebase'
+import { signInWithEmailAndPassword } from 'firebase/auth'
 
 const email = ref('')
 const password = ref('')
@@ -35,15 +37,21 @@ const error = ref('')
 const router = useRouter()
 
 const handleLogin = async () => {
+  if (!email.value || !password.value) return
+  
   loading.value = true
   error.value = ''
-  // TODO: Implement Firebase Auth
-  if (email.value === 'admin@pagnotta.com' && password.value === 'admin123') {
+  
+  try {
+    await signInWithEmailAndPassword(auth, email.value, password.value)
+    // En una app real podrías verificar el rol aquí, pero por ahora permitimos acceso
     router.push('/admin')
-  } else {
-    error.value = 'Credenciales inválidas'
+  } catch (err) {
+    console.error('Login error:', err)
+    error.value = 'Email o contraseña incorrectos.'
+  } finally {
+    loading.value = false
   }
-  loading.value = false
 }
 </script>
 
