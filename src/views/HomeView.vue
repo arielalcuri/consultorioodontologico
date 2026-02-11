@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="home">
     <!-- Navbar -->
     <nav class="navbar" :class="{ 'scrolled': scrollY > 50 }">
@@ -36,7 +36,7 @@
     <!-- Mobile Menu Panel -->
     <div class="mobile-menu" :class="{ 'active': menuOpen }">
       <button class="close-menu-btn" @click="menuOpen = false">
-        ✕
+        Ã¢ï¿½"ï¿½?ï¿½
       </button>
       <div class="mobile-links">
         <a href="#inicio" @click="menuOpen = false">Inicio</a>
@@ -58,7 +58,7 @@
             Tu sonrisa merece el cuidado de <span class="highlight-text">Expertos</span>
           </h1>
           <p class="hero-subtitle">
-            Brindamos una atención dedicada y un trato humano excepcional en Villa Lugano.
+            Brindamos una atenciï¿½fÂ³n dedicada y un trato humano excepcional en Villa Lugano.
             Resultados naturales que priorizan tu salud y bienestar.
           </p>
           <div class="hero-buttons">
@@ -71,7 +71,7 @@
             <i class="fas fa-check-circle"></i>
             <span>Implantes Certificados</span>
           </div>
-          <img :src="siteConfig.heroImage" alt="Clínica" class="main-hero-img">
+          <img :src="siteConfig.heroImage" alt="Clï¿½fÂ­nica" class="main-hero-img">
         </div>
       </div>
     </section>
@@ -118,17 +118,17 @@
         <div class="image-side">
           <div class="exp-badge shadow-pulse">
             <span class="num">30+</span>
-            <span class="txt">Años de <br>Trayectoria <br><strong>Profesional</strong></span>
+            <span class="txt">Aï¿½fÂ±os de <br>Trayectoria <br><strong>Profesional</strong></span>
           </div>
           <img :src="siteConfig.aboutImage" alt="Profesional" class="about-img">
         </div>
         <div class="text-side">
           <span class="tag">Sobre Nosotros</span>
-          <h2 class="section-title"><span class="highlight-text">Cercanía</span></h2>
-          <p class="about-p">En el Centro Odontológico Integral, brindamos una atención personalizada enfocada en la salud y el bienestar integral de cada paciente.</p>
+          <h2 class="section-title"><span class="highlight-text">Cercanï¿½fÂ­a</span></h2>
+          <p class="about-p">En el Centro Odontológico Integral, brindamos una atenciï¿½fÂ³n personalizada enfocada en la salud y el bienestar integral de cada paciente.</p>
           <ul class="feature-checks">
-            <li><i class="fas fa-check-circle"></i> <span>Atención dedicada Martes y Jueves</span></li>
-            <li><i class="fas fa-check-circle"></i> <span>Ubicación privilegiada en Villa Lugano</span></li>
+            <li><i class="fas fa-check-circle"></i> <span>Atenciï¿½fÂ³n dedicada Martes y Jueves</span></li>
+            <li><i class="fas fa-check-circle"></i> <span>Ubicaciï¿½fÂ³n privilegiada en Villa Lugano</span></li>
           </ul>
         </div>
       </div>
@@ -184,7 +184,7 @@
           <p class="mt-4">Liderando la salud dental en Villa Lugano con profesionalismo y calidez.</p>
         </div>
         <div class="footer-contact">
-          <h4>Vía Directa</h4>
+          <h4>Vï¿½fÂ­a Directa</h4>
           <div class="contact-links">
             <a :href="'tel:' + config.phoneFixed"><i class="fas fa-phone"></i> {{ config.phoneFixed }}</a>
             <a :href="'https://wa.me/549' + config.phoneMobile" target="_blank"><i class="fab fa-whatsapp"></i> {{ config.phoneMobile }}</a>
@@ -237,13 +237,13 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label>Teléfono</label>
+              <label>Telï¿½fÂ©fono</label>
               <input v-model="form.phone" type="tel" required>
             </div>
             <div class="form-group">
               <label>Fecha deseada (Mar/Jue)</label>
               <input v-model="form.selectedDate" type="date" :min="today" :filter="onlyTuTh" required>
-              <small class="hint">Atención: Martes y Jueves</small>
+              <small class="hint">Atenciï¿½fÂ³n: Martes y Jueves</small>
             </div>
           </div>
 
@@ -261,16 +261,16 @@
 
           <div class="form-group">
             <label>Motivo de consulta</label>
-            <textarea v-model="form.details" rows="3" placeholder="Cuéntenos brevemente qué le sucede..."></textarea>
+            <textarea v-model="form.details" rows="3" placeholder="Cuï¿½fÂ©ntenos brevemente quï¿½fÂ© le sucede..."></textarea>
           </div>
 
           <button type="submit" class="btn btn-primary btn-full" :disabled="submitting || !isTuTh">
-            {{ submitting ? 'Procesando...' : 'Confirmar Petición' }}
+            {{ submitting ? 'Procesando...' : 'Confirmar Peticiï¿½fÂ³n' }}
           </button>
           
           <p v-if="!isTuTh && form.selectedDate && !currentHoliday" class="error-text">Por favor seleccione un Martes o Jueves.</p>
-          <p v-if="currentHoliday" class="error-text">El día seleccionado es feriado: {{ currentHoliday }}</p>
-          <p v-if="success" class="success-alert">¡Solicitud enviada! Nos contactaremos para confirmar el horario final.</p>
+          <p v-if="currentHoliday" class="error-text">El dï¿½fÂ­a seleccionado es feriado: {{ currentHoliday }}</p>
+          <p v-if="success" class="success-alert">ï¿½,Â¡Solicitud enviada! Nos contactaremos para confirmar el horario final.</p>
         </form>
       </div>
     </div>
@@ -329,19 +329,19 @@ onMounted(() => {
 onUnmounted(() => window.removeEventListener('scroll', updateScroll))
 
 const config = {
-  address: 'Cosquín 4809, Villa Lugano, CABA',
+  address: 'Cosquï¿½fÂ­n 4809, Villa Lugano, CABA',
   hours: 'Martes y Jueves de 15:30 a 20:00hs',
   phoneFixed: '4601-8957',
   phoneMobile: '1130019567'
 }
 
 const services = [
-  { title: 'Estética', description: 'Carillas, coronas y diseño de sonrisa.', icon: 'fas fa-gem' },
-  { title: 'Ortodoncia', description: 'Brackets metálicos, cerámicos y zafiro.', icon: 'fas fa-teeth-open' },
-  { title: 'Implantes', description: 'Reposición dental con tecnología de punta.', icon: 'fas fa-shapes' },
+  { title: 'Estï¿½fÂ©tica', description: 'Carillas, coronas y diseï¿½fÂ±o de sonrisa.', icon: 'fas fa-gem' },
+  { title: 'Ortodoncia', description: 'Brackets metï¿½fÂ¡licos, cerï¿½fÂ¡micos y zafiro.', icon: 'fas fa-teeth-open' },
+  { title: 'Implantes', description: 'Reposiciï¿½fÂ³n dental con tecnologï¿½fÂ­a de punta.', icon: 'fas fa-shapes' },
   { title: 'Endodoncia', description: 'Tratamiento de conducto avanzado.', icon: 'fas fa-microscope' },
-  { title: 'Periodoncia', description: 'Cuidado especializado de encías.', icon: 'fas fa-hand-holding-medical' },
-  { title: 'Odontopediatría', description: 'Atención dental kids con cariño.', icon: 'fas fa-child' }
+  { title: 'Periodoncia', description: 'Cuidado especializado de encï¿½fÂ­as.', icon: 'fas fa-hand-holding-medical' },
+  { title: 'Odontopediatrï¿½fÂ­a', description: 'Atenciï¿½fÂ³n dental kids con cariï¿½fÂ±o.', icon: 'fas fa-child' }
 ]
 
 const form = ref({
@@ -362,7 +362,7 @@ const closeBookingModal = () => {
 const isTuTh = computed(() => {
   if (!form.value.selectedDate) return true
   
-  // 1. Validar si la fecha existe físicamente (ej: 29 de febrero en años no bisiestos)
+  // 1. Validar si la fecha existe fï¿½fÂ­sicamente (ej: 29 de febrero en aï¿½fÂ±os no bisiestos)
   const parts = form.value.selectedDate.split('-')
   const y = parseInt(parts[0])
   const m = parseInt(parts[1])
@@ -387,7 +387,7 @@ const submitBooking = async () => {
   if (!isTuTh.value) return
   submitting.value = true
   
-  // Registrar al usuario automáticamente si no existe para que el ChatBot lo reconozca
+  // Registrar al usuario automï¿½fÂ¡ticamente si no existe para que el ChatBot lo reconozca
   registerUser({
     name: form.value.firstName,
     lastName: form.value.lastName,
@@ -578,7 +578,18 @@ footer .logo-text .sub-brand { color: #cbd5e1 !important; }
   .hero-title { font-size: 2.5rem; }
   .hero-subtitle { margin: 0 auto 3rem; }
   .hero-buttons { justify-content: center; }
-  .hero-image-wrapper { display: none; }
+  .hero-image-wrapper { 
+    display: block; 
+    margin-top: 3rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .main-hero-img { 
+    border-radius: 2rem;
+    box-shadow: 15px 15px 0 #0e749010;
+  }
+  .glass-float { display: none; }
   .footer-grid { grid-template-columns: 1fr; gap: 3rem; }
 }
 @media (max-width: 600px) {
