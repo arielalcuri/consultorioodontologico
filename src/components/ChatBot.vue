@@ -343,7 +343,7 @@ const callGeminiAI = async (userText) => {
   `
 
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-pro:generateContent?key=${botKnowledge.value.geminiKey}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${botKnowledge.value.geminiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -353,12 +353,14 @@ const callGeminiAI = async (userText) => {
       })
     })
     const data = await response.json()
+    console.log("Gemini API Response:", data)
     if (data.candidates && data.candidates.length > 0) {
       return data.candidates[0].content.parts[0].text
     }
+    if (data.error) console.warn("Gemini Error Detail:", data.error)
     return null
   } catch (err) {
-    console.error("Gemini Error:", err)
+    console.error("Gemini Connection Error:", err)
     return null
   }
 }
