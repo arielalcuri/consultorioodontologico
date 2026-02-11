@@ -189,6 +189,10 @@ const SITE_CONFIG_KEY = 'dental_clinic_site_config_v6'
 const defaultSiteConfig = {
     heroImage: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1000&auto=format&fit=crop',
     aboutImage: 'https://estudidentalbarcelona.com/wp-content/uploads/2017/08/tomografia-dientes.jpg',
+    address: 'Cosquín 4809, Villa Lugano, CABA',
+    hours: 'Martes y Jueves de 15:30 a 20:00hs',
+    phoneFixed: '4601-8957',
+    phoneMobile: '1130019567',
     faqs: [
         { id: 1, q: '¿Aceptan obras sociales?', a: 'No, no trabajamos con obras sociales/prepagas. En caso de necesitar reintegro, realizamos la factura y la orden con el diagnóstico para que puedas solicitar el reintegro.' },
         { id: 2, q: '¿Tienen estacionamiento?', a: 'Hay estacionamiento libre sobre la calle Cosquín y alrededores.' },

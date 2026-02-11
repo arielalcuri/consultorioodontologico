@@ -184,12 +184,12 @@
           <p class="mt-4">Liderando la salud dental en Villa Lugano con profesionalismo y calidez.</p>
         </div>
         <div class="footer-contact">
-          <h4>Vï¿½fÂ­a Directa</h4>
+          <h4>Vía Directa</h4>
           <div class="contact-links">
-            <a :href="'tel:' + config.phoneFixed"><i class="fas fa-phone"></i> {{ config.phoneFixed }}</a>
-            <a :href="'https://wa.me/549' + config.phoneMobile" target="_blank"><i class="fab fa-whatsapp"></i> {{ config.phoneMobile }}</a>
-            <p><i class="fas fa-map-marker-alt"></i> {{ config.address }}</p>
-            <p><i class="fas fa-clock"></i> {{ config.hours }}</p>
+            <a :href="'tel:' + siteConfig.phoneFixed"><i class="fas fa-phone"></i> {{ siteConfig.phoneFixed }}</a>
+            <a :href="'https://wa.me/549' + siteConfig.phoneMobile" target="_blank"><i class="fab fa-whatsapp"></i> {{ siteConfig.phoneMobile }}</a>
+            <p><i class="fas fa-map-marker-alt"></i> {{ siteConfig.address }}</p>
+            <p><i class="fas fa-clock"></i> {{ siteConfig.hours }}</p>
           </div>
         </div>
         <div class="footer-map">
@@ -237,13 +237,13 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label>Telï¿½fÂ©fono</label>
+              <label>Teléfono</label>
               <input v-model="form.phone" type="tel" required>
             </div>
             <div class="form-group">
               <label>Fecha deseada (Mar/Jue)</label>
-              <input v-model="form.selectedDate" type="date" :min="today" :filter="onlyTuTh" required>
-              <small class="hint">Atenciï¿½fÂ³n: Martes y Jueves</small>
+              <input v-model="form.selectedDate" type="date" :min="today" required>
+              <small class="hint">Atención: Martes y Jueves</small>
             </div>
           </div>
 
@@ -265,12 +265,12 @@
           </div>
 
           <button type="submit" class="btn btn-primary btn-full" :disabled="submitting || !isTuTh">
-            {{ submitting ? 'Procesando...' : 'Confirmar Peticiï¿½fÂ³n' }}
+            {{ submitting ? 'Procesando...' : 'Confirmar Petición' }}
           </button>
           
           <p v-if="!isTuTh && form.selectedDate && !currentHoliday" class="error-text">Por favor seleccione un Martes o Jueves.</p>
-          <p v-if="currentHoliday" class="error-text">El dï¿½fÂ­a seleccionado es feriado: {{ currentHoliday }}</p>
-          <p v-if="success" class="success-alert">ï¿½,Â¡Solicitud enviada! Nos contactaremos para confirmar el horario final.</p>
+          <p v-if="currentHoliday" class="error-text">El día seleccionado es feriado: {{ currentHoliday }}</p>
+          <p v-if="success" class="success-alert">¡Solicitud enviada! Nos contactaremos para confirmar el horario final.</p>
         </form>
       </div>
     </div>
@@ -351,7 +351,7 @@ onMounted(async () => {
 })
 onUnmounted(() => window.removeEventListener('scroll', updateScroll))
 
-// Los datos de config y servicios ahora se manejan centralizadamente en store.js y se sincronizan con Firestore
+// Los datos de configuración y servicios ahora se manejan centralizadamente en store.js y se sincronizan con Firestore
 
 const form = ref({
   lastName: '', firstName: '', dni: '', birthDate: '',
