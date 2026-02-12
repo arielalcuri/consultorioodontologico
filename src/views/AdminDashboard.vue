@@ -505,7 +505,19 @@
             <div class="form-group"><label>Título</label><input v-model="serviceForm.title"></div>
             <div class="form-group"><label>Descripción</label><input v-model="serviceForm.description"></div>
             <div class="form-group"><label>Icono (FA)</label><input v-model="serviceForm.icon"></div>
-            <button type="submit" class="btn btn-primary btn-full">Guardar</button>
+            
+            <div class="form-group">
+               <label>Días de Atención</label>
+               <div class="days-selector-grid">
+                  <label v-for="(day, idx) in ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']" :key="idx" class="day-checkbox">
+                     <input type="checkbox" :value="idx" v-model="serviceForm.allowedDays">
+                     <span>{{ day }}</span>
+                  </label>
+               </div>
+               <small class="text-xs text-gray-400 mt-1">Selecciona los días que se presta este servicio (ej: Ortodoncia Martes).</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full mt-4">Guardar</button>
          </form>
        </div>
     </div>
@@ -685,7 +697,7 @@ const assignedTime = ref('')
 const editForm = ref({})
 const editUserForm = ref({})
 const newUserForm = ref({ name: '', lastName: '', dni: '', email: '', phone: '', birthDate: '', address: '', password: '' })
-const serviceForm = ref({ title: '', description: '', icon: 'fas fa-tooth' })
+const serviceForm = ref({ title: '', description: '', icon: 'fas fa-tooth', allowedDays: [2, 4] })
 const isEditingService = ref(false)
 
 const tabs = [
@@ -768,8 +780,8 @@ const saveNewUser = () => {
 const saveUserEdit = () => { updateUser(editUserForm.value.email, editUserForm.value); showEditUserModal.value = false; }
 const handleDeleteUser = (email) => { if (confirm('¿Eliminar usuario?')) deleteUser(email) }
 
-const openNewServiceModal = () => { isEditingService.value = false; serviceForm.value = { title: '', description: '', icon: 'fas fa-tooth' }; showServiceModal.value = true; }
-const openEditServiceModal = (service) => { isEditingService.value = true; serviceForm.value = { ...service }; showServiceModal.value = true; }
+const openNewServiceModal = () => { isEditingService.value = false; serviceForm.value = { title: '', description: '', icon: 'fas fa-tooth', allowedDays: [2, 4] }; showServiceModal.value = true; }
+const openEditServiceModal = (service) => { isEditingService.value = true; serviceForm.value = { allowedDays: [2, 4], ...service }; showServiceModal.value = true; }
 const saveService = () => {
   if (isEditingService.value) updateService(serviceForm.value.id, serviceForm.value)
   else addService(serviceForm.value)
@@ -982,4 +994,11 @@ input, select, textarea { padding: 0.8rem; border: 1px solid #e2e8f0; border-rad
 .user-result-item:hover { background: #f8fafc; color: #0e7490; }
 .user-result-item:last-child { border-bottom: none; }
 .selected-user-summary p { margin: 0; color: #1e293b; font-size: 0.9rem; }
+
+/* Day Selector Styles */
+.days-selector-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-top: 0.5rem; }
+.day-checkbox { display: flex; align-items: center; gap: 0.4rem; cursor: pointer; background: #f8fafc; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; transition: 0.3s; }
+.day-checkbox:hover { background: #f1f5f9; }
+.day-checkbox input:checked + span { color: #0e7490; font-weight: 700; }
+.day-checkbox input { width: auto; height: auto; margin: 0; }
 </style>

@@ -123,11 +123,11 @@ export const deleteUser = (email) => {
 
 // SERVICES STORE
 const defaultServices = [
-    { id: 1, title: 'Estética Dental', description: 'Carillas, coronas de porcelana y diseño de sonrisa.', icon: 'fas fa-gem', image: 'https://i.ibb.co/BK5xKtkY/Captura-de-pantalla-2026-02-01-134805.jpg' },
-    { id: 2, title: 'Ortodoncia', description: 'Brackets metálicos, cerámicos y zafiro.', icon: 'fas fa-teeth-open', image: 'https://neuroncdn.com/cdn-0001/7ad87ade3f518397f0d5a5236a18cbba3158cabbf035f5fca872c426744003c7?ts=1727129627' },
-    { id: 3, title: 'Implantes', description: 'Reposición dental con implantes de alta precisión.', icon: 'fas fa-shapes', image: 'https://www.alvaroyfrancodental.com/wp-content/uploads/2020/02/consejos-para-el-cuidado-de-tus-implantes-dentales.jpg' },
-    { id: 4, title: 'Endodoncia', description: 'Tratamiento de conducto avanzado y sin dolor.', icon: 'fas fa-microscope', image: 'https://clinicadentalgetxo.es/wp-content/uploads/2019/11/endodoncia-1200x900.png' },
-    { id: 5, title: 'Prótesis', description: 'Soluciones completas y naturales para tu dentadura.', icon: 'fas fa-user-md', image: 'https://i.ibb.co/TBBFVHwX/Captura-de-pantalla-2026-02-01-134013.jpg' }
+    { id: 1, title: 'Estética Dental', description: 'Carillas, coronas de porcelana y diseño de sonrisa.', icon: 'fas fa-gem', image: 'https://i.ibb.co/BK5xKtkY/Captura-de-pantalla-2026-02-01-134805.jpg', allowedDays: [2, 4] },
+    { id: 2, title: 'Ortodoncia', description: 'Brackets metálicos, cerámicos y zafiro.', icon: 'fas fa-teeth-open', image: 'https://neuroncdn.com/cdn-0001/7ad87ade3f518397f0d5a5236a18cbba3158cabbf035f5fca872c426744003c7?ts=1727129627', allowedDays: [2] },
+    { id: 3, title: 'Implantes', description: 'Reposición dental con implantes de alta precisión.', icon: 'fas fa-shapes', image: 'https://www.alvaroyfrancodental.com/wp-content/uploads/2020/02/consejos-para-el-cuidado-de-tus-implantes-dentales.jpg', allowedDays: [2, 4] },
+    { id: 4, title: 'Endodoncia', description: 'Tratamiento de conducto avanzado y sin dolor.', icon: 'fas fa-microscope', image: 'https://clinicadentalgetxo.es/wp-content/uploads/2019/11/endodoncia-1200x900.png', allowedDays: [2, 4] },
+    { id: 5, title: 'Prótesis', description: 'Soluciones completas y naturales para tu dentadura.', icon: 'fas fa-user-md', image: 'https://i.ibb.co/TBBFVHwX/Captura-de-pantalla-2026-02-01-134013.jpg', allowedDays: [2, 4] }
 ]
 
 const SERVICE_KEY = 'dental_clinic_services_v5'

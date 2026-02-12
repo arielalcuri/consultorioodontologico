@@ -167,7 +167,7 @@ const extractDni = (text) => {
   return match ? match[0] : null
 }
 
-const getNextAvailableDays = (count = 4) => {
+const getNextAvailableDays = (allowedDays = [2, 4], count = 4) => {
   const dates = []
   let current = new Date()
   current.setHours(0, 0, 0, 0)
@@ -179,8 +179,8 @@ const getNextAvailableDays = (count = 4) => {
     current.setDate(current.getDate() + 1) // Empezar desde mañana
     const dayOfWeek = current.getDay()
     
-    // Martes (2) o Jueves (4)
-    if (dayOfWeek === 2 || dayOfWeek === 4) {
+    // Si el día de la semana está en la lista de permitidos para este servicio
+    if (allowedDays.includes(dayOfWeek)) {
       const y = current.getFullYear()
       const m = String(current.getMonth() + 1).padStart(2, '0')
       const d = String(current.getDate()).padStart(2, '0')
@@ -390,7 +390,9 @@ const callGeminiAI = async (userText) => {
     1. TONO: Muy cálido, profesional y extremadamente empático (muchos pacientes tienen miedo).
     2. BREVEDAD: Da respuestas directas pero completas. Usa negritas para datos importantes.
     3. TURNOS: Si quieren un turno, invítalos a usar el botón "Reservar Cita". 
-    4. REGLA DE CALENDARIO: Atendemos únicamente **Martes y Jueves**. Si el usuario menciona otro día, sugiérele amablemente el Martes o Jueves más cercano.
+    4. REGLA DE CALENDARIO: Atendemos únicamente Martes y Jueves para la mayoría de los servicios, pero **Ortodoncia es específicamente los MARTES**. 
+       Usa esta lista de servicios con sus días permitidos para asesorar: ${allServices.value.map(s => `${s.title}: ${s.allowedDays?.map(d => ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"][d]).join(' y ')}`).join(', ')}.
+       Si el usuario menciona un día que no corresponde, infórmale qué días atendemos para ese tratamiento específico.
     5. FECHAS: Entiendes cualquier formato (como 12/02/2026, 12 de febrero, o "el próximo martes"). Siempre confirma la fecha en formato "Jueves 12 de Febrero" para que el usuario esté seguro.
     6. NO DIAGNÓSTICOS: No des diagnósticos médicos. Di "Lo ideal es que la Dra. Adriana te revise personalmente".
     7. IDENTIDAD: Eres la asistente de la Dra. Adriana Pagnotta. No menciones que eres una IA.
@@ -622,11 +624,16 @@ const handleActiveUserFlow = async (text, forceAction) => {
       state.extractedService = serviceObj
       state.serviceMode = false
       
-      const availableDates = getNextAvailableDays(4)
+      // Obtener los días permitidos desde la configuración del servicio (default 2, 4 if not set)
+      const allowed = serviceObj.allowedDays || [2, 4]
+      const availableDates = getNextAvailableDays(allowed, 4)
       const dateOptions = availableDates.map(d => ({ label: d.label, action: `date_${d.date}` }))
 
+      const dayNames = ["Domingos", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábados"]
+      const allowedNames = allowed.map(d => dayNames[d]).join(' y ')
+
       return { 
-          text: `Bien, agendemos ${serviceObj.title}. 🗓️ ¿Para qué fecha te gustaría?<br><br>Recordá que atendemos los <strong>Martes y Jueves</strong>. Aquí tenés los próximos días disponibles:`, 
+          text: `Bien, agendemos ${serviceObj.title}. 🗓️ ¿Para qué fecha te gustaría?<br><br>Ten en cuenta que para este servicio atendemos los <strong>${allowedNames}</strong>. Aquí tienes los próximos días con disponibilidad:`, 
           options: dateOptions 
       }
   }
