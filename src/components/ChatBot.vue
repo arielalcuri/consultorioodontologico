@@ -130,8 +130,13 @@ onMounted(async () => {
 })
 
 const handleOptionClick = (opt) => {
-  userInput.value = opt.label // Simular escritura
-  sendMessage(null, opt.action)
+  if (opt.action && opt.action.startsWith('date_')) {
+      userInput.value = opt.label
+      sendMessage(null, opt.action.replace('date_', ''))
+  } else {
+      userInput.value = opt.label // Simular escritura
+      sendMessage(null, opt.action)
+  }
 }
 
 const bookingState = ref({
@@ -162,17 +167,56 @@ const extractDni = (text) => {
   return match ? match[0] : null
 }
 
-const extractDateStr = (text) => {
-  const months = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
-  const regex = /(\d{1,2})\s+de\s+([a-zA-Z]+)/i
-  const match = normalizeText(text).match(regex)
-  if (match) {
-    const day = parseInt(match[1])
-    const month = months.indexOf(match[2])
-    if (month !== -1) {
-      return `2026-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+const getNextAvailableDays = (count = 4) => {
+  const dates = []
+  let current = new Date()
+  current.setHours(0, 0, 0, 0)
+  
+  const dayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
+  const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+
+  while (dates.length < count) {
+    current.setDate(current.getDate() + 1) // Empezar desde mañana
+    const dayOfWeek = current.getDay()
+    
+    // Martes (2) o Jueves (4)
+    if (dayOfWeek === 2 || dayOfWeek === 4) {
+      const y = current.getFullYear()
+      const m = String(current.getMonth() + 1).padStart(2, '0')
+      const d = String(current.getDate()).padStart(2, '0')
+      
+      dates.push({
+        date: `${y}-${m}-${d}`,
+        label: `${dayNames[dayOfWeek]} ${parseInt(d)} de ${monthNames[current.getMonth()]}`
+      })
     }
   }
+  return dates
+}
+
+const extractDateStr = (text) => {
+  const months = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+  const normalized = normalizeText(text)
+
+  // Formato: 12 de febrero
+  const regexLiteral = /(\d{1,2})\s+de\s+([a-zA-Z]+)/i
+  const matchLit = normalized.match(regexLiteral)
+  if (matchLit) {
+    const day = parseInt(matchLit[1])
+    const month = months.indexOf(matchLit[2])
+    if (month !== -1) return `2026-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+  }
+
+  // Formato: 12/02/2026 o 12/02
+  const regexNumeric = /(\d{1,2})[\/-](\d{1,2})(?:[\/-](\d{2,4}))?/
+  const matchNum = normalized.match(regexNumeric)
+  if (matchNum) {
+    const day = String(matchNum[1]).padStart(2, '0')
+    const month = String(matchNum[2]).padStart(2, '0')
+    const year = matchNum[3] ? (matchNum[3].length === 2 ? '20' + matchNum[3] : matchNum[3]) : '2026'
+    return `${year}-${month}-${day}`
+  }
+
   return null
 }
 
@@ -345,9 +389,11 @@ const callGeminiAI = async (userText) => {
     REGLAS DE ORO:
     1. TONO: Muy cálido, profesional y extremadamente empático (muchos pacientes tienen miedo).
     2. BREVEDAD: Da respuestas directas pero completas. Usa negritas para datos importantes.
-    3. TURNOS: Si quieren un turno, invítalos a usar el botón "Reservar Cita" o a darnos su DNI para buscarlos.
-    4. NO DIAGNÓSTICOS: No des diagnósticos médicos. Di "Lo ideal es que la Dra. te revise personalmente".
-    5. IDENTIDAD: Eres la asistente de la Dra. Adriana. No digas soy un modelo de lenguaje.
+    3. TURNOS: Si quieren un turno, invítalos a usar el botón "Reservar Cita". 
+    4. REGLA DE CALENDARIO: Atendemos únicamente **Martes y Jueves**. Si el usuario menciona otro día, sugiérele amablemente el Martes o Jueves más cercano.
+    5. FECHAS: Entiendes cualquier formato (como 12/02/2026, 12 de febrero, o "el próximo martes"). Siempre confirma la fecha en formato "Jueves 12 de Febrero" para que el usuario esté seguro.
+    6. NO DIAGNÓSTICOS: No des diagnósticos médicos. Di "Lo ideal es que la Dra. Adriana te revise personalmente".
+    7. IDENTIDAD: Eres la asistente de la Dra. Adriana Pagnotta. No menciones que eres una IA.
   `
 
   // Función interna para realizar la llamada (con soporte para reintento)
@@ -575,9 +621,13 @@ const handleActiveUserFlow = async (text, forceAction) => {
       const serviceObj = allServices.value.find(s => s.title === serviceName) || { title: serviceName }
       state.extractedService = serviceObj
       state.serviceMode = false
+      
+      const availableDates = getNextAvailableDays(4)
+      const dateOptions = availableDates.map(d => ({ label: d.label, action: `date_${d.date}` }))
+
       return { 
-          text: `Bien, agendemos ${serviceObj.title}. 🗓️ ¿Para qué fecha te gustaría? (Recordá: Martes y Jueves)`, 
-          options: [] // Date picker no tenemos en chat, input libre
+          text: `Bien, agendemos ${serviceObj.title}. 🗓️ ¿Para qué fecha te gustaría?<br><br>Recordá que atendemos los <strong>Martes y Jueves</strong>. Aquí tenés los próximos días disponibles:`, 
+          options: dateOptions 
       }
   }
 
