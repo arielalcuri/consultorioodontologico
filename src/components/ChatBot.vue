@@ -463,7 +463,10 @@ const callGeminiAI = async (userText) => {
           await new Promise(resolve => setTimeout(resolve, 2000));
           return performFetch(true); // El reintento
         }
-        if (data.error.code === 429) return "¡Hola! Estoy recibiendo muchas consultas. 😅 Dame un segundo o si prefieres, escríbenos al WhatsApp 11 3001-9567.";
+        if (data.error.code === 429) {
+          console.warn("Gemini colapsado (429), activando cerebro local...");
+          return null; // Devolver null para que se active getLocalFallbackResponse
+        }
         return null;
       }
 
