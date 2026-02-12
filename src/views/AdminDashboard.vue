@@ -709,8 +709,9 @@ const tabs = [
   { id: 'solicitudes', name: 'Solicitudes', icon: 'fas fa-bell' },
   { id: 'agenda', name: 'Agenda/Calendario', icon: 'fas fa-calendar-alt' },
   { id: 'usuarios', name: 'Pacientes', icon: 'fas fa-users' },
-  { id: 'servicios', name: 'Servicios', icon: 'fas fa-concierge-bell' },
-  { id: 'chatbot', name: 'ChatBot AI', icon: 'fas fa-robot' }
+  { id: 'servicios', name: 'Servicios', icon: 'fas fa-list' },
+  { id: 'chatbot', name: 'ChatBot AI', icon: 'fas fa-robot' },
+  { id: 'web', name: 'Web / Nube', icon: 'fas fa-globe' }
 ]
 
 const pendingTurnos = computed(() => allTurnos.value.filter(t => t.status === 'pendiente'))

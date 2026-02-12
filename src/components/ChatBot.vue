@@ -118,14 +118,23 @@ onMounted(async () => {
   currentOptions.value = defaultOptions
   setTimeout(() => showBadge.value = false, 5000)
 
-  // Cargar conocimiento del bot desde Firebase
+  // Cargar TODO desde Firebase para que el chat esté actualizado
   try {
+    // 1. Cargar Conocimiento Bio/IA
     const botSnap = await getDoc(doc(db, 'config', 'chatbot'))
-    if (botSnap.exists()) {
-      Object.assign(botKnowledge.value, botSnap.data())
+    if (botSnap.exists()) Object.assign(botKnowledge.value, botSnap.data())
+
+    // 2. Cargar Config de Sitio (Dirección, Tel, FAQs)
+    const siteSnap = await getDoc(doc(db, 'config', 'site'))
+    if (siteSnap.exists()) Object.assign(siteConfig.value, siteSnap.data())
+
+    // 3. Cargar Lista de Servicios Actualizada
+    const svcSnap = await getDoc(doc(db, 'config', 'services'))
+    if (svcSnap.exists() && svcSnap.data().list) {
+      allServices.value = svcSnap.data().list
     }
   } catch (err) {
-    console.warn('Usando configuración local para el ChatBot')
+    console.warn('Error al sincronizar con Cloud, usando datos locales:', err)
   }
 })
 
@@ -268,10 +277,15 @@ const intents = [
   },
   {
     id: 'servicios',
-    patterns: ['hacen', 'especialidad', 'servicio', 'tratamiento', 'haces', 'ofrecen', 'limpieza', 'carilla', 'implante', 'ortodoncia'],
+    get patterns() {
+      // Dinámicamente incluimos todos los nombres de servicios configurados
+      const base = ['hacen', 'especialidad', 'servicio', 'tratamiento', 'haces', 'ofrecen', 'limpieza', 'carilla', 'implante', 'ortodoncia']
+      const dynamic = allServices.value.map(s => normalizeText(s.title))
+      return [...new Set([...base, ...dynamic])]
+    },
     get response() {
       const list = allServices.value.map(s => s.title).join(', ')
-      return `Nuestra clínica ofrece tratamientos especializados en: <strong>${list}</strong>. ¿Te gustaría información detallada sobre alguno de ellos en particular?`
+      return `Realizamos los siguientes tratamientos especializados: <strong>${list}</strong>. ¿Te gustaría información detallada sobre alguno de ellos en particular?`
     }
   },
   {
