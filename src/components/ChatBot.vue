@@ -321,43 +321,71 @@ const processIntent = (input, forceAction = null) => {
 }
 
 // --- INTELLIGENT AI (Gemini) ---
+// --- INTELLIGENT AI (Gemini) ---
 const callGeminiAI = async (userText) => {
   if (!botKnowledge.value.geminiKey || !siteConfig.value) return null
 
-  const clinicContext = `
-    Eres la asistente virtual del "Centro Odontológico Integral Dra. Adriana Pagnotta".
-    Información de la clínica:
-    - Dirección: ${siteConfig.value.address}
-    - Horarios: ${siteConfig.value.hours}
-    - Contacto: ${siteConfig.value.phoneFixed}, WhatsApp: ${siteConfig.value.phoneMobile}
-    - Servicios: ${allServices.value.map(s => s.title).join(', ')}
-    - Bio Chatbot: ${botKnowledge.value.welcome}
-    - Info Obras Sociales: ${botKnowledge.value.insuranceInfo}
+  // Construir historial para darle "memoria" a la IA (últimos 6 mensajes)
+  const history = messages.value.slice(-6).map(m => ({
+    role: m.role === 'user' ? 'user' : 'model',
+    parts: [{ text: m.text.replace(/<[^>]*>?/gm, '') }] // Limpiar HTML para la IA
+  }))
 
-    Instrucciones:
-    1. Responde de forma cálida, profesional y empática. Muchos pacientes tienen miedo.
-    2. Usa la información de arriba para responder.
-    3. Si el usuario quiere un turno, dile que puede usar el botón "Reservar Cita" o pedirlo por aquí (identificándose con su DNI).
-    4. Nunca des diagnósticos médicos, solo información general.
-    5. No menciones que eres una IA a menos que te pregunten. Eres la asistente de la Dra. Adriana.
+  const clinicContext = `
+    Eres la asistente virtual experta del "Centro Odontológico Integral Dra. Adriana Pagnotta".
+    
+    CONOCIMIENTO DE LA CLÍNICA:
+    - Dirección: ${siteConfig.value.address}
+    - Horarios: ${siteConfig.value.hours}. Atendemos Martes y Jueves.
+    - Teléfonos: Fijo ${siteConfig.value.phoneFixed}, WhatsApp ${siteConfig.value.phoneMobile}.
+    - Servicios: ${allServices.value.map(s => s.title).join(', ')}.
+    - Bio Chatbot: ${botKnowledge.value.welcome}
+    - Obras Sociales: ${botKnowledge.value.insuranceInfo || 'No trabajamos con obras sociales directamente, pero emitimos factura para reintegro.'}
+    - FAQs: ${siteConfig.value.faqs?.map(f => `P: ${f.q} R: ${f.a}`).join(' | ')}
+
+    REGLAS DE ORO:
+    1. TONO: Muy cálido, profesional y extremadamente empático (muchos pacientes tienen miedo).
+    2. BREVEDAD: Da respuestas directas pero completas. Usa negritas para datos importantes.
+    3. TURNOS: Si quieren un turno, invítalos a usar el botón "Reservar Cita" o a darnos su DNI para buscarlos.
+    4. NO DIAGNÓSTICOS: No des diagnósticos médicos. Di "Lo ideal es que la Dra. te revise personalmente".
+    5. IDENTIDAD: Eres la asistente de la Dra. Adriana. No digas soy un modelo de lenguaje.
   `
 
   try {
+    const payload = {
+      contents: [
+        { role: 'user', parts: [{ text: `INSTRUCCIONES DE SISTEMA: ${clinicContext}` }] },
+        { role: 'model', parts: [{ text: 'Entendido. Actuaré como la asistente de la Dra. Adriana Pagnotta siguiendo todas sus instrucciones.' }] },
+        ...history,
+        { role: 'user', parts: [{ text: userText }] }
+      ],
+      generationConfig: {
+        temperature: 0.7,
+        topP: 0.9,
+        maxOutputTokens: 500
+      }
+    }
+
     const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${botKnowledge.value.geminiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: `Contexto: ${clinicContext}\n\nUsuario dice: ${userText}` }]
-        }]
-      })
+      body: JSON.stringify(payload)
     })
+
     const data = await response.json()
-    console.log("Gemini API Response:", data)
-    if (data.candidates && data.candidates.length > 0) {
+    
+    if (data.error) {
+       if (data.error.code === 429) {
+          console.warn("Gemini Rate Limited (429)");
+          return "¡Hola! Estoy recibiendo muchas consultas en este momento. 😅 Dame un segundo o si prefieres, puedes contactarnos directamente por WhatsApp al 11 3001-9567.";
+       }
+       console.error("Gemini API Error:", data.error);
+       return null;
+    }
+
+    if (data.candidates && data.candidates[0].content) {
       return data.candidates[0].content.parts[0].text
     }
-    if (data.error) console.warn("Gemini Error Detail:", data.error)
     return null
   } catch (err) {
     console.error("Gemini Connection Error:", err)
