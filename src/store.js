@@ -235,7 +235,13 @@ const defaultSiteConfig = {
 }
 
 const storedConfig = localStorage.getItem(SITE_CONFIG_KEY)
-export const siteConfig = ref(storedConfig ? JSON.parse(storedConfig) : defaultSiteConfig)
+const initialConfig = storedConfig ? JSON.parse(storedConfig) : { ...defaultSiteConfig }
+Object.keys(defaultSiteConfig).forEach(key => {
+    if (initialConfig[key] === undefined) {
+        initialConfig[key] = defaultSiteConfig[key]
+    }
+})
+export const siteConfig = ref(initialConfig)
 
 watch(siteConfig, (newVal) => {
     localStorage.setItem(SITE_CONFIG_KEY, JSON.stringify(newVal))

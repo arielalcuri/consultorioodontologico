@@ -334,7 +334,7 @@
               <i class="fas fa-gift text-amber-600"></i>
               <h3>Gestión de Promociones (Pop-up)</h3>
             </div>
-            <div class="p-6">
+            <div class="p-6" v-if="siteConfig.promo">
               <div class="flex items-center gap-4 mb-6 p-4 bg-slate-50 rounded-xl">
                  <label class="switch">
                     <input type="checkbox" v-model="siteConfig.promo.enabled">
@@ -360,6 +360,9 @@
                   <input v-model="siteConfig.promo.btnText" class="input-modern" placeholder="Ej: Aprovechar ahora">
                 </div>
               </div>
+            </div>
+            <div class="p-6 text-center text-slate-400" v-else>
+               Cargando configuración de promociones...
             </div>
           </div>
         </div>
