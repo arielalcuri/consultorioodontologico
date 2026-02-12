@@ -364,6 +364,30 @@ const processIntent = (input, forceAction = null) => {
   return { text: response, options: nextOpts }
 }
 
+// --- LOCAL FALLBACK ENGINE (Anti-Collapse) ---
+const getLocalFallbackResponse = (userText) => {
+  const norm = normalizeText(userText)
+  
+  // 1. Buscar en FAQs
+  const foundFaq = siteConfig.value.faqs?.find(f => normalizeText(f.q).split(' ').some(word => word.length > 3 && norm.includes(word)))
+  if (foundFaq) return foundFaq.a
+
+  // 2. Buscar en Servicios
+  const foundSvc = allServices.value.find(s => norm.includes(normalizeText(s.title)))
+  if (foundSvc) {
+    const days = foundSvc.allowedDays?.map(d => ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"][d]).join(', ')
+    return `Ofrecemos el servicio de <strong>${foundSvc.title}</strong>: ${foundSvc.description} Atendemos los días: <strong>${days || 'Martes y Jueves'}</strong>. ¿Te gustaría agendar un turno?`
+  }
+
+  // 3. Info Básica
+  if (norm.includes('horario') || norm.includes('atienden') || norm.includes('abierto')) return `Atendemos los días <strong>Martes y Jueves</strong>. Horarios: ${siteConfig.value.hours}`
+  if (norm.includes('donde') || norm.includes('direccion') || norm.includes('calle') || norm.includes('ubicacion')) return `Estamos en ${siteConfig.value.address}. ¡Te esperamos!`
+  if (norm.includes('telefono') || norm.includes('whatsapp') || norm.includes('contacto')) return `Podés llamarnos al fijo ${siteConfig.value.phoneFixed} o por WhatsApp al ${siteConfig.value.phoneMobile}.`
+  if (norm.includes('obra social') || norm.includes('prepaga') || norm.includes('osde')) return botKnowledge.value.insuranceInfo || "No trabajamos directo con obras sociales, pero emitimos factura para reintegro."
+
+  return null // No se encontró respuesta local
+}
+
 // --- INTELLIGENT AI (Gemini) ---
 const callGeminiAI = async (userText) => {
   if (!botKnowledge.value.geminiKey || !siteConfig.value) return null
@@ -680,6 +704,10 @@ const handleActiveUserFlow = async (text, forceAction) => {
   if (!forceAction && !state.serviceMode && !state.cancelMode) {
       const aiResponse = await callGeminiAI(text)
       if (aiResponse) return { text: aiResponse, options: defaultOptions }
+      
+      // FALLBACK LOCAL SI GEMINI FALLA (429)
+      const local = getLocalFallbackResponse(text)
+      if (local) return { text: local, options: defaultOptions }
   }
 
   return processIntent(text, forceAction)
@@ -743,7 +771,13 @@ const sendMessage = async (e, forceAction = null) => {
              if (aiResponse) {
                 result = { text: aiResponse, options: defaultOptions }
              } else {
-                result = processIntent(text, forceAction)
+                // FALLBACK LOCAL SI GEMINI FALLA
+                const local = getLocalFallbackResponse(text)
+                if (local) {
+                  result = { text: local, options: defaultOptions }
+                } else {
+                  result = processIntent(text, forceAction)
+                }
              }
           } else {
              result = processIntent(text, forceAction)

@@ -195,7 +195,12 @@
             <tbody>
               <tr v-for="service in allServices" :key="service.id">
                 <td><i :class="service.icon" class="service-icon-preview"></i></td>
-                <td><strong>{{ service.title }}</strong></td>
+                <td>
+                  <strong>{{ service.title }}</strong><br>
+                  <small class="text-gray-500">
+                    {{ service.allowedDays?.map(d => ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][d]).join(', ') || 'Sin días' }}
+                  </small>
+                </td>
                 <td>{{ service.description }}</td>
                 <td class="actions">
                   <button @click="openEditServiceModal(service)" class="btn-icon edit"><i class="fas fa-edit"></i></button>
