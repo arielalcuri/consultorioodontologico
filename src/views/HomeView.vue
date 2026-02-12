@@ -1,5 +1,52 @@
 ﻿<template>
-  <div class="home">
+  <div class="home" :class="{ 'dark-mode': isDarkMode }">
+    <!-- Welcome Promo Modal (Step 5) -->
+    <div v-if="showPromo" class="modal-overlay" @click.self="showPromo = false" style="z-index: 10000;">
+      <div class="promo-card scale-in glass-morphism">
+        <button @click="showPromo = false" class="close-promo">&times;</button>
+        <div class="promo-badge">¡Oferta de Bienvenida! 🎁</div>
+        <h2>Sonrisa Brillante</h2>
+        <p>Obtén un <strong>20% de descuento</strong> en tu primera limpieza dental este mes.</p>
+        <button @click="showPromo = false; openBookingModal()" class="btn btn-primary btn-full mt-4">Aprovechar ahora</button>
+      </div>
+    </div>
+
+    <!-- Patient Dashboard Panel (Step 2) -->
+    <div v-if="showPatientPanel && currentUser" class="patient-panel-overlay" @click.self="showPatientPanel = false">
+       <div class="patient-panel glass-morphism slide-right">
+          <div class="panel-header">
+             <h3>Hola, {{ currentUser.name }} 👋</h3>
+             <button @click="showPatientPanel = false" class="close-panel">&times;</button>
+          </div>
+          
+          <div class="panel-section">
+             <h4>🚀 Próximo Turno</h4>
+             <div v-if="nextTurn" class="next-turn-card">
+                <div class="countdown-badge">En {{ nextTurnCountDown }} días</div>
+                <p><strong>{{ nextTurn.type }}</strong></p>
+                <p><i class="far fa-calendar-alt"></i> {{ formatDate(nextTurn.selectedDate) }}</p>
+                <p><i class="far fa-clock"></i> {{ nextTurn.assignedTime || 'Pendiente de horario' }}</p>
+                <div class="panel-actions mt-4">
+                   <button @click="cancelTurno(nextTurn.id)" class="btn-text-danger">Cancelar Turno</button>
+                </div>
+             </div>
+             <p v-else class="text-sm text-slate-500">No tienes turnos pendientes de atención.</p>
+          </div>
+
+          <div class="panel-section">
+             <h4>📜 Historial Reciente</h4>
+             <div class="history-list">
+                <div v-for="t in pastTurns" :key="t.id" class="history-item">
+                   <span class="history-date">{{ formatDate(t.selectedDate) }}</span>
+                   <span class="history-type">{{ t.type }}</span>
+                </div>
+                <p v-if="pastTurns.length === 0" class="text-xs text-slate-400">Sin historial registrado.</p>
+             </div>
+          </div>
+
+          <button @click="logoutUser" class="btn btn-secondary btn-full mt-auto">Cerrar Sesión</button>
+       </div>
+    </div>
     <!-- Navbar -->
     <nav class="navbar" :class="{ 'scrolled': scrollY > 50 }">
       <div class="container nav-container">
@@ -20,6 +67,15 @@
         </div>
 
         <div class="nav-actions">
+          <button @click="isDarkMode = !isDarkMode" class="theme-toggle" title="Cambiar Tema">
+            <i :class="isDarkMode ? 'fas fa-sun' : 'fas fa-moon'"></i>
+          </button>
+          
+          <div v-if="currentUser" class="user-pill" @click="showPatientPanel = !showPatientPanel">
+            <i class="fas fa-user-circle"></i>
+            <span>{{ currentUser.name }}</span>
+          </div>
+
           <button @click="openBookingModal" class="btn btn-primary shadow-pulse">Reservar Cita</button>
           <button class="mobile-menu-btn" @click="toggleMenu">
           <span></span>
@@ -280,11 +336,53 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import ChatBot from '../components/ChatBot.vue'
-import { allServices, addTurno, registerUser, siteConfig, botKnowledge } from '../store'
+import { allServices, addTurno, registerUser, siteConfig, botKnowledge, isDarkMode, currentUser, allTurnos, logout, updateTurno, deleteTurno } from '../store'
 import { db } from '../firebase'
 import { doc, getDoc } from 'firebase/firestore'
+
+const showPatientPanel = ref(false)
+const showPromo = ref(false)
+
+const nextTurn = computed(() => {
+   if (!currentUser.value) return null
+   // Filtrar turnos del usuario que sean hoy o en el futuro
+   const now = new Date().toISOString().split('T')[0]
+   return allTurnos.value
+     .filter(t => t.dni === currentUser.value.dni && t.selectedDate >= now)
+     .sort((a, b) => a.selectedDate.localeCompare(b.selectedDate))[0]
+})
+
+const nextTurnCountDown = computed(() => {
+   if (!nextTurn.value) return 0
+   const diff = new Date(nextTurn.value.selectedDate).getTime() - new Date().getTime()
+   return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
+})
+
+const pastTurns = computed(() => {
+   if (!currentUser.value) return []
+   const now = new Date().toISOString().split('T')[0]
+   return allTurnos.value
+     .filter(t => t.dni === currentUser.value.dni && t.selectedDate < now)
+     .sort((a,b) => b.selectedDate.localeCompare(a.selectedDate))
+     .slice(0, 3)
+})
+
+const logoutUser = () => {
+   logout()
+   showPatientPanel.value = false
+}
+
+const cancelTurno = (id) => {
+   if (confirm('¿Estás seguro de que deseas cancelar este turno?')) {
+      deleteTurno(id)
+   }
+}
+
+const formatDate = (dateStr) => {
+  if(!dateStr) return '-'
+  const [y, m, d] = dateStr.split('-')
+  return `${d}/${m}/${y}`
+}
 
 const scrollY = ref(0)
 const mobileMenuOpen = ref(false)
@@ -318,6 +416,14 @@ const updateScroll = () => { scrollY.value = window.scrollY }
 onMounted(async () => {
   window.addEventListener('scroll', updateScroll)
   fetchFeriados()
+  
+  // Mostrar promo después de 4 segundos
+  if (!sessionStorage.getItem('promo_shown')) {
+     setTimeout(() => {
+        showPromo.value = true
+        sessionStorage.setItem('promo_shown', 'true')
+     }, 4000)
+  }
   
   // SociableKit Script Injection
   const scriptId = 'SociableKitScript'
@@ -641,4 +747,60 @@ footer .logo-text .sub-brand { color: #cbd5e1 !important; }
 @media (max-width: 768px) {
   .testimonials-grid { grid-template-columns: 1fr; }
 }
+
+/* New Features Styles (Profile, Dark Mode, Promo) */
+.home.dark-mode { background-color: var(--bg-primary); color: var(--text-primary); }
+.home.dark-mode .navbar { background: rgba(15, 23, 42, 0.9); border-bottom-color: var(--border-color); }
+.home.dark-mode .navbar.scrolled { background: var(--bg-primary); }
+.home.dark-mode .service-card-modern, 
+.home.dark-mode .faq-item, 
+.home.dark-mode .review-card,
+.home.dark-mode .section.bg-light,
+.home.dark-mode .modal-content,
+.home.dark-mode .promo-card,
+.home.dark-mode .next-turn-card { border-color: var(--border-color); }
+
+.home.dark-mode .service-card-modern,
+.home.dark-mode .faq-item,
+.home.dark-mode .review-card {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.home.dark-mode .section.bg-light { background: #0f172a !important; }
+.home.dark-mode h1, .home.dark-mode h2, .home.dark-mode h3, .home.dark-mode h4, .home.dark-mode .brand { color: var(--text-primary); }
+.home.dark-mode .hero-subtitle, .home.dark-mode .faq-answer p, .home.dark-mode .review-text { color: var(--text-secondary); }
+
+.nav-actions { display: flex; align-items: center; gap: 1rem; }
+.theme-toggle { background: var(--bg-secondary); border: 1px solid var(--border-color); width: 40px; height: 40px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; color: var(--brand-primary); display: flex; align-items: center; justify-content: center; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+.theme-toggle:hover { transform: rotate(15deg) scale(1.1); background: var(--brand-primary); color: white; }
+
+.user-pill { display: flex; align-items: center; gap: 0.6rem; background: var(--brand-primary); color: white; padding: 0.5rem 1.2rem; border-radius: 50px; cursor: pointer; transition: 0.3s; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(14, 116, 144, 0.3); }
+.user-pill:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+.promo-card { position: relative; width: 90%; max-width: 400px; padding: 2.5rem; text-align: center; border-radius: 2.5rem; border-top: 5px solid var(--brand-primary); animation: slideUp 0.5s ease; }
+.promo-badge { background: #fef3c7; color: #d97706; font-weight: 800; font-size: 0.75rem; padding: 0.4rem 1rem; border-radius: 50px; display: inline-block; margin-bottom: 1.2rem; }
+.promo-card h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 0.5rem; }
+.close-promo { position: absolute; top: 1.2rem; right: 1.2rem; border: none; background: #f1f5f9; width: 30px; height: 30px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; color: #475569; display: flex; align-items: center; justify-content: center; }
+
+.patient-panel-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); z-index: 9000; display: flex; justify-content: flex-end; }
+.patient-panel { width: 100%; max-width: 380px; height: 100%; padding: 2.5rem; display: flex; flex-direction: column; gap: 2rem; box-shadow: -15px 0 50px rgba(0,0,0,0.15); border-left: 1px solid var(--border-color); }
+.panel-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; }
+.panel-header h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; }
+.close-panel { font-size: 2rem; border: none; background: none; cursor: pointer; color: var(--text-secondary); line-height: 1; }
+.panel-section h4 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--brand-primary); margin-bottom: 1.5rem; font-weight: 800; }
+.next-turn-card { background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary)); color: white; padding: 1.8rem; border-radius: 2rem; position: relative; overflow: hidden; box-shadow: 0 10px 25px rgba(14, 116, 144, 0.3); }
+.countdown-badge { position: absolute; top: 0; right: 0; background: rgba(255,255,255,0.15); padding: 0.6rem 1.2rem; border-bottom-left-radius: 1.5rem; font-size: 0.75rem; font-weight: 900; letter-spacing: 0.5px; }
+.next-turn-card p { margin: 0.4rem 0; font-size: 1rem; font-weight: 500; }
+.next-turn-card i { margin-right: 8px; opacity: 0.8; }
+.btn-text-danger { background: none; border: none; color: #fee2e2; font-size: 0.85rem; cursor: pointer; padding: 0.5rem 0; opacity: 0.8; font-weight: 600; }
+.btn-text-danger:hover { opacity: 1; text-decoration: underline; }
+.history-list { display: flex; flex-direction: column; gap: 10px; }
+.history-item { display: flex; justify-content: space-between; padding: 1rem; background: var(--bg-primary); border-radius: 1rem; border: 1px solid var(--border-color); font-size: 0.9rem; transition: 0.3s; }
+.history-item:hover { transform: scale(1.02); border-color: var(--brand-primary); }
+.history-date { font-weight: 800; color: var(--brand-primary); }
+.history-type { color: var(--text-primary); }
+
+.slide-right { animation: slideRight 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); }
+@keyframes slideRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 </style>

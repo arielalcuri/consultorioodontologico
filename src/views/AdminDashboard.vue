@@ -125,9 +125,14 @@
                   <td>{{ turno.lastName }}, {{ turno.firstName }}</td>
                   <td><span class="badge-specialty" :class="isOrto(turno.type) ? 'orto' : 'gral'">{{ turno.type }}</span></td>
                   <td>
-                    <a :href="'https://wa.me/549' + turno.phone?.replace(/\D/g,'')" target="_blank" class="wa-link">
-                      <i class="fab fa-whatsapp"></i> WhatsApp
-                    </a>
+                    <div style="display: flex; gap: 5px; align-items: center;">
+                      <a :href="'https://wa.me/549' + turno.phone?.replace(/\D/g,'')" target="_blank" class="wa-link">
+                        <i class="fab fa-whatsapp"></i> Chat
+                      </a>
+                      <button @click="remindTurno(turno)" class="btn-sm btn-primary" style="padding: 2px 8px; font-size: 0.7rem;">
+                        <i class="fas fa-bell"></i> Recordar
+                      </button>
+                    </div>
                   </td>
                   <td class="actions">
                     <button @click="openEditModal(turno)" class="btn-icon edit"><i class="fas fa-edit"></i></button>
@@ -879,6 +884,12 @@ const saveManualTurn = () => {
     
     showManualTurnModal.value = false
     alert('Turno asignado correctamente')
+}
+
+const remindTurno = (turno) => {
+    const msg = encodeURIComponent(`Hola ${turno.firstName}, te recordamos tu turno para el día ${formatDate(turno.selectedDate)} a las ${turno.assignedTime}hs en el consultorio de la Dra. Pagnotta. ¡Te esperamos!`)
+    const phone = turno.phone?.replace(/\D/g, '')
+    window.open(`https://wa.me/549${phone}?text=${msg}`, '_blank')
 }
 
 const testGemini = async () => {

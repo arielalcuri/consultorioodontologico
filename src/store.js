@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 
 const TURNO_KEY = 'dental_clinic_turnos_v1'
 const USER_KEY = 'dental_clinic_users_v1'
@@ -214,4 +214,20 @@ watch(siteConfig, (newVal) => {
 
 export const updateSiteConfig = (newData) => {
     siteConfig.value = { ...siteConfig.value, ...newData }
+}
+
+// --- SESSION & UI STATE ---
+export const currentUser = ref(JSON.parse(localStorage.getItem('dental_clinic_current_user') || 'null'))
+watch(currentUser, (val) => {
+    localStorage.setItem('dental_clinic_current_user', JSON.stringify(val))
+})
+
+export const isDarkMode = ref(localStorage.getItem('dental_clinic_dark_mode') === 'true')
+watch(isDarkMode, (val) => {
+    localStorage.setItem('dental_clinic_dark_mode', val)
+    document.documentElement.classList.toggle('dark-mode', val)
+})
+
+export const logout = () => {
+    currentUser.value = null
 }
