@@ -321,7 +321,6 @@ const processIntent = (input, forceAction = null) => {
 }
 
 // --- INTELLIGENT AI (Gemini) ---
-// --- INTELLIGENT AI (Gemini) ---
 const callGeminiAI = async (userText) => {
   if (!botKnowledge.value.geminiKey || !siteConfig.value) return null
 
@@ -364,7 +363,7 @@ const callGeminiAI = async (userText) => {
         generationConfig: { temperature: 0.7, topP: 0.9, maxOutputTokens: 500 }
       }
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${botKnowledge.value.geminiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${botKnowledge.value.geminiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
