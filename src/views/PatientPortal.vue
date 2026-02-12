@@ -204,7 +204,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { allTurnos, addTurno, allServices } from '../store'
+import { allServices, addTurno, registerUser, updateUser, deleteTurno, siteConfig, allTurnos } from '../store'
 import { auth, db } from '../firebase'
 import { 
   signInWithEmailAndPassword, 
@@ -305,7 +305,16 @@ const handleRegister = async () => {
       photoURL: regForm.value.dni // Guardamos el DNI aquí temporalmente
     })
     
-    // Podrías guardar el resto de datos (dirección, tel) en Firestore aquí
+    // Guardar el resto de datos en Firestore (Sincronizado con Store)
+    await registerUser({
+      name: regForm.value.name,
+      lastName: regForm.value.lastName,
+      dni: regForm.value.dni,
+      email: regForm.value.email,
+      phone: regForm.value.phone,
+      address: regForm.value.address,
+      birthDate: regForm.value.birthDate
+    })
     
     regForm.value = { name: '', lastName: '', dni: '', birthDate: '', address: '', email: '', password: '', confirmPassword: '', phone: '' }
   } catch (err) {

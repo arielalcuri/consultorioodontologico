@@ -327,6 +327,41 @@
               </div>
             </div>
           </div>
+
+          <!-- Promo Config Section -->
+          <div class="admin-card mt-8">
+            <div class="card-header bg-amber-50">
+              <i class="fas fa-gift text-amber-600"></i>
+              <h3>Gestión de Promociones (Pop-up)</h3>
+            </div>
+            <div class="p-6">
+              <div class="flex items-center gap-4 mb-6 p-4 bg-slate-50 rounded-xl">
+                 <label class="switch">
+                    <input type="checkbox" v-model="siteConfig.promo.enabled">
+                    <span class="slider round"></span>
+                 </label>
+                 <div>
+                    <span class="font-bold text-slate-800">Mostrar Pop-up de Promoción</span>
+                    <p class="text-xs text-slate-500">Si lo activas, aparecerá a los pacientes después de unos segundos.</p>
+                 </div>
+              </div>
+              
+              <div v-if="siteConfig.promo.enabled" class="chatbot-config-grid">
+                <div class="form-group">
+                  <label>Título del Pop-up</label>
+                  <input v-model="siteConfig.promo.title" class="input-modern" placeholder="Ej: ¡Oferta de Bienvenida!">
+                </div>
+                <div class="form-group">
+                  <label>Texto de la Promoción</label>
+                  <textarea v-model="siteConfig.promo.text" rows="2" class="input-modern" placeholder="Ej: Obtén un 20% de descuento..."></textarea>
+                </div>
+                <div class="form-group">
+                  <label>Texto del Botón</label>
+                  <input v-model="siteConfig.promo.btnText" class="input-modern" placeholder="Ej: Aprovechar ahora">
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -783,12 +818,12 @@ const handleDelete = (id) => { if (confirm('¿Eliminar turno?')) deleteTurno(id)
 
 const openEditUserModal = (user) => { editUserForm.value = { ...user }; showEditUserModal.value = true; }
 const openNewUserModal = () => { newUserForm.value = { name: '', lastName: '', dni: '', email: '', phone: '', birthDate: '', password: 'admin' }; showNewUserModal.value = true; }
-const saveNewUser = () => { 
-  allUsers.value.push({ ...newUserForm.value }); 
+const saveNewUser = async () => { 
+  await registerUser({ ...newUserForm.value }); 
   showNewUserModal.value = false;
-  alert('Paciente registrado exitosamente en LocalStorage');
+  alert('Paciente registrado exitosamente');
 }
-const saveUserEdit = () => { updateUser(editUserForm.value.email, editUserForm.value); showEditUserModal.value = false; }
+const saveUserEdit = async () => { await updateUser(editUserForm.value.email, editUserForm.value); showEditUserModal.value = false; }
 const handleDeleteUser = (email) => { if (confirm('¿Eliminar usuario?')) deleteUser(email) }
 
 const openNewServiceModal = () => { isEditingService.value = false; serviceForm.value = { title: '', description: '', icon: 'fas fa-tooth', allowedDays: [2, 4] }; showServiceModal.value = true; }
@@ -845,7 +880,7 @@ const goToNewUserStep = () => {
     manualTurnStep.value = 2
 }
 
-const saveNewUserAndContinue = () => {
+const saveNewUserAndContinue = async () => {
     // Validar campos obligatorios
     const f = newUserForm.value
     if(!f.name || !f.lastName || !f.dni || !f.birthDate || !f.address || !f.phone || !f.password) {
@@ -853,13 +888,13 @@ const saveNewUserAndContinue = () => {
         return
     }
     // Guardar usuario
-    allUsers.value.push({ ...newUserForm.value })
+    await registerUser({ ...newUserForm.value })
     selectedUserForTurn.value = { ...newUserForm.value }
     alert('Paciente creado correctamente')
     manualTurnStep.value = 3
 }
 
-const saveManualTurn = () => {
+const saveManualTurn = async () => {
     if (!manualTurnForm.value.time) {
         alert('Debe asignar un horario')
         return
@@ -868,7 +903,7 @@ const saveManualTurn = () => {
     // Construir fecha formato YYYY-MM-DD
     const dateStr = `${currentYear.value}-${String(currentMonth.value + 1).padStart(2, '0')}-${String(selectedDay.value).padStart(2, '0')}`
 
-    addTurno({
+    await addTurno({
         firstName: selectedUserForTurn.value.name,
         lastName: selectedUserForTurn.value.lastName,
         dni: selectedUserForTurn.value.dni,
@@ -1018,4 +1053,15 @@ input, select, textarea { padding: 0.8rem; border: 1px solid #e2e8f0; border-rad
 .day-checkbox:hover { background: #f1f5f9; }
 .day-checkbox input:checked + span { color: #0e7490; font-weight: 700; }
 .day-checkbox input { width: auto; height: auto; margin: 0; }
+/* Switch Toggle */
+.switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; }
+input:checked + .slider { background-color: #0e7490; }
+input:focus + .slider { box-shadow: 0 0 1px #0e7490; }
+input:checked + .slider:before { transform: translateX(20px); }
+.slider.round { border-radius: 34px; }
+.slider.round:before { border-radius: 50%; }
+
 </style>

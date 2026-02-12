@@ -1,4 +1,18 @@
 import { ref, watch, computed } from 'vue'
+import { db } from './firebase'
+import {
+    collection,
+    addDoc,
+    onSnapshot,
+    updateDoc,
+    deleteDoc,
+    doc,
+    getDocs,
+    query,
+    where,
+    setDoc,
+    getDoc
+} from 'firebase/firestore'
 
 const TURNO_KEY = 'dental_clinic_turnos_v1'
 const USER_KEY = 'dental_clinic_users_v1'
@@ -53,60 +67,67 @@ const defaultTurnos = [
 ]
 
 // TURNOS STORE
-const storedTurnos = localStorage.getItem(TURNO_KEY)
-export const allTurnos = ref(storedTurnos ? JSON.parse(storedTurnos) : defaultTurnos)
+export const allTurnos = ref([])
 
-watch(allTurnos, (newVal) => {
-    localStorage.setItem(TURNO_KEY, JSON.stringify(newVal))
-}, { deep: true })
+// Escucha en tiempo real de Turnos de Firebase
+onSnapshot(collection(db, 'turnos'), (snapshot) => {
+    allTurnos.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+})
 
 // USERS STORE
-const storedUsers = localStorage.getItem(USER_KEY)
-export const allUsers = ref(storedUsers ? JSON.parse(storedUsers) : defaultUsers)
+export const allUsers = ref([])
 
-watch(allUsers, (newVal) => {
-    localStorage.setItem(USER_KEY, JSON.stringify(newVal))
-}, { deep: true })
+// Escucha en tiempo real de Usuarios de Firebase
+onSnapshot(collection(db, 'users'), (snapshot) => {
+    allUsers.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+})
+
 
 // ACTIONS
-export const addTurno = (turno) => {
-    allTurnos.value.push({
-        id: Date.now(),
-        status: 'pendiente',
-        assignedTime: null,
-        ...turno
-    })
+export const addTurno = async (turno) => {
+    try {
+        await addDoc(collection(db, 'turnos'), {
+            ...turno,
+            status: turno.status || 'pendiente',
+            assignedTime: turno.assignedTime || null,
+            createdAt: new Date().toISOString()
+        })
+    } catch (err) { console.error("Error al agendar:", err) }
 }
 
-export const updateTurno = (id, updatedFields) => {
-    const index = allTurnos.value.findIndex(t => t.id === id)
-    if (index !== -1) {
-        allTurnos.value[index] = { ...allTurnos.value[index], ...updatedFields }
-    }
+export const updateTurno = async (id, updatedFields) => {
+    try {
+        const docRef = doc(db, 'turnos', id)
+        await updateDoc(docRef, updatedFields)
+    } catch (err) { console.error("Error al actualizar turno:", err) }
 }
 
-export const deleteTurno = (id) => {
-    allTurnos.value = allTurnos.value.filter(t => t.id !== id)
+export const deleteTurno = async (id) => {
+    try {
+        await deleteDoc(doc(db, 'turnos', id))
+    } catch (err) { console.error("Error al borrar turno:", err) }
 }
 
-export const registerUser = (userData) => {
-    const exists = allUsers.value.find(u => u.dni === userData.dni)
-    if (!exists) {
-        allUsers.value.push(userData)
+export const registerUser = async (userData) => {
+    try {
+        // Guardar en Firestore para que el Admin lo vea
+        await setDoc(doc(db, 'users', userData.email), {
+            ...userData,
+            createdAt: new Date().toISOString()
+        })
         return userData
-    }
-    return exists
+    } catch (err) { console.error("Error al registrar usuario:", err) }
 }
 
 export const findUser = (email, password) => {
     return allUsers.value.find(u => u.email === email && u.password === password)
 }
 
-export const updateUser = (email, updatedFields) => {
-    const index = allUsers.value.findIndex(u => u.email === email)
-    if (index !== -1) {
-        allUsers.value[index] = { ...allUsers.value[index], ...updatedFields }
-    }
+export const updateUser = async (email, updatedFields) => {
+    try {
+        const docRef = doc(db, 'users', email)
+        await updateDoc(docRef, updatedFields)
+    } catch (err) { console.error("Error al actualizar perfil:", err) }
 }
 
 export const findUserByDetails = (dni, lastName) => {
@@ -117,8 +138,10 @@ export const findUserByDetails = (dni, lastName) => {
     })
 }
 
-export const deleteUser = (email) => {
-    allUsers.value = allUsers.value.filter(u => u.email !== email)
+export const deleteUser = async (email) => {
+    try {
+        await deleteDoc(doc(db, 'users', email))
+    } catch (err) { console.error("Error al borrar usuario:", err) }
 }
 
 // SERVICES STORE
@@ -202,7 +225,13 @@ const defaultSiteConfig = {
         { id: 1, name: 'Valeria M.', stars: 5, text: 'Excelente atención de la Dra. Pagnotta. Me realizó un tratamiento de conducto sin dolor y con mucha paciencia. ¡Super recomendable!', date: 'Hace 2 meses' },
         { id: 2, name: 'Carlos R.', stars: 5, text: 'El consultorio es impecable y la atención muy puntual. Me explicaron todo el procedimiento de mis implantes con claridad. Gracias.', date: 'Hace 5 meses' },
         { id: 3, name: 'Mariana S.', stars: 5, text: 'Llevo a mis hijos hace años y siempre nos reciben con una sonrisa. Gran profesional y excelente ser humano.', date: 'Hace 1 año' }
-    ]
+    ],
+    promo: {
+        enabled: false,
+        title: '¡Oferta de Bienvenida! 🎁',
+        text: 'Obtén un 20% de descuento en tu primera limpieza dental este mes.',
+        btnText: 'Aprovechar ahora'
+    }
 }
 
 const storedConfig = localStorage.getItem(SITE_CONFIG_KEY)

@@ -4,10 +4,12 @@
     <div v-if="showPromo" class="modal-overlay" @click.self="showPromo = false" style="z-index: 10000;">
       <div class="promo-card scale-in glass-morphism">
         <button @click="showPromo = false" class="close-promo">&times;</button>
-        <div class="promo-badge">¡Oferta de Bienvenida! 🎁</div>
-        <h2>Sonrisa Brillante</h2>
-        <p>Obtén un <strong>20% de descuento</strong> en tu primera limpieza dental este mes.</p>
-        <button @click="showPromo = false; openBookingModal()" class="btn btn-primary btn-full mt-4">Aprovechar ahora</button>
+        <div class="promo-badge">¡Oferta Especial! 🎁</div>
+        <h2>{{ siteConfig.promo?.title || 'Sonrisa Brillante' }}</h2>
+        <p>{{ siteConfig.promo?.text || 'Obtén un descuento especial.' }}</p>
+        <button @click="showPromo = false; openBookingModal()" class="btn btn-primary btn-full mt-4">
+          {{ siteConfig.promo?.btnText || 'Aprovechar ahora' }}
+        </button>
       </div>
     </div>
 
@@ -419,8 +421,8 @@ onMounted(async () => {
   window.addEventListener('scroll', updateScroll)
   fetchFeriados()
   
-  // Mostrar promo después de 4 segundos
-  if (!sessionStorage.getItem('promo_shown')) {
+  // Mostrar promo si está habilitada y no se mostró en esta sesión
+  if (siteConfig.value.promo?.enabled && !sessionStorage.getItem('promo_shown')) {
      setTimeout(() => {
         showPromo.value = true
         sessionStorage.setItem('promo_shown', 'true')
@@ -505,7 +507,7 @@ const submitBooking = async () => {
   submitting.value = true
   
   // Registrar al usuario automáticamente si no existe para que el ChatBot lo reconozca
-  registerUser({
+  await registerUser({
     name: form.value.firstName,
     lastName: form.value.lastName,
     dni: form.value.dni,
@@ -515,7 +517,7 @@ const submitBooking = async () => {
     password: 'paciente' // Clave por defecto
   })
 
-  addTurno({
+  await addTurno({
     firstName: form.value.firstName,
     lastName: form.value.lastName,
     dni: form.value.dni,
