@@ -11,9 +11,6 @@
           <i :class="tab.icon"></i> {{ tab.name }}
           <span v-if="tab.id === 'solicitudes' && pendingCount > 0" class="badge-count">{{ pendingCount }}</span>
         </button>
-        <button @click="currentTab = 'web'" :class="{ active: currentTab === 'web' }">
-          <i class="fas fa-globe"></i> Web
-        </button>
       </nav>
       <button class="logout-btn" @click="handleLogout">
         <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
@@ -251,6 +248,12 @@
                 <div class="form-group">
                   <label>Imagen Hero (Principal)</label>
                   <input v-model="siteConfig.heroImage" class="input-modern" placeholder="URL de la imagen">
+                  <div class="mt-2 flex gap-2">
+                    <input type="file" @change="e => handleDirectUpload(e, 'hero')" accept="image/*" class="hidden" ref="heroInput">
+                    <button @click="$refs.heroInput.click()" class="btn btn-secondary btn-sm" :disabled="isUploading">
+                       <i class="fas fa-upload"></i> Subir desde mi PC
+                    </button>
+                  </div>
                   <div class="preview-img-admin mt-2">
                     <img :src="siteConfig.heroImage" alt="Hero Preview">
                   </div>
@@ -258,6 +261,12 @@
                 <div class="form-group">
                   <label>Imagen Nosotros (Sobre Adriana)</label>
                   <input v-model="siteConfig.aboutImage" class="input-modern" placeholder="URL de la imagen">
+                  <div class="mt-2 flex gap-2">
+                    <input type="file" @change="e => handleDirectUpload(e, 'about')" accept="image/*" class="hidden" ref="aboutInput">
+                    <button @click="$refs.aboutInput.click()" class="btn btn-secondary btn-sm" :disabled="isUploading">
+                       <i class="fas fa-upload"></i> Subir desde mi PC
+                    </button>
+                  </div>
                   <div class="preview-img-admin mt-2">
                     <img :src="siteConfig.aboutImage" alt="About Preview">
                   </div>
@@ -466,6 +475,57 @@
           </div>
         </div>
       </section>
+
+      <!-- Galeria Tab -->
+      <section v-if="currentTab === 'galeria'" class="tab-content">
+        <div class="gallery-admin-container">
+           <div class="admin-card mb-8">
+              <div class="card-header flex justify-between items-center">
+                 <div class="flex items-center gap-2">
+                    <i class="fas fa-images"></i>
+                    <h3>Banco de Imágenes del Consultorio</h3>
+                 </div>
+                 <div>
+                    <input type="file" @change="handleGalleryUpload" accept="image/*" class="hidden" ref="galleryInput" multiple>
+                    <button @click="$refs.galleryInput.click()" class="btn btn-primary" :disabled="isUploading">
+                       <i class="fas fa-cloud-upload-alt mr-2"></i> Subir Nueva Foto
+                    </button>
+                 </div>
+              </div>
+              <div class="p-6">
+                 <p class="text-sm text-slate-500 mb-6">Todas las fotos que subas aquí se guardan en Firebase y puedes usarlas en cualquier parte del sitio.</p>
+                 
+                 <div v-if="isUploading" class="upload-progress-bar mb-6">
+                    <div class="spinner"></div> Subiendo archivos al servidor...
+                 </div>
+
+                 <div v-if="galleryFiles.length === 0" class="no-data-msg">
+                    <i class="fas fa-image mb-3" style="font-size: 3rem; opacity: 0.2;"></i>
+                    <br>Aún no hay fotos en tu galería cloud.
+                 </div>
+
+                 <div class="gallery-grid-admin">
+                    <div v-for="img in galleryFiles" :key="img.fullPath" class="gallery-item-card">
+                       <div class="gallery-img-wrapper">
+                          <img :src="img.url" alt="Gallery item">
+                          <div class="gallery-overlay">
+                             <button @click="copyToClipboard(img.url)" class="btn-overlay" title="Copiar Link">
+                                <i class="fas fa-link"></i>
+                             </button>
+                             <button @click="deleteFromGallery(img)" class="btn-overlay delete" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                             </button>
+                          </div>
+                       </div>
+                       <div class="gallery-info">
+                          <span class="text-xs truncate block text-slate-500">{{ img.name }}</span>
+                       </div>
+                    </div>
+                 </div>
+              </div>
+           </div>
+        </div>
+      </section>
     </main>
 
     <!-- Modals (Simplified versions of the existing ones) -->
@@ -553,6 +613,20 @@
             <div class="form-group"><label>Título</label><input v-model="serviceForm.title"></div>
             <div class="form-group"><label>Descripción</label><input v-model="serviceForm.description"></div>
             <div class="form-group"><label>Icono (FA)</label><input v-model="serviceForm.icon"></div>
+            
+            <div class="form-group">
+               <label>Imagen del Servicio</label>
+               <input v-model="serviceForm.image" class="input-modern" placeholder="URL de la imagen">
+               <div class="mt-2 flex gap-2">
+                  <input type="file" @change="e => handleDirectUpload(e, 'service')" accept="image/*" class="hidden" ref="serviceImgInput">
+                  <button type="button" @click="$refs.serviceImgInput.click()" class="btn btn-secondary btn-sm" :disabled="isUploading">
+                     <i class="fas fa-upload"></i> Subir Foto
+                  </button>
+               </div>
+               <div v-if="serviceForm.image" class="preview-img-admin mt-2">
+                  <img :src="serviceForm.image" alt="Service Preview">
+               </div>
+            </div>
             
             <div class="form-group">
                <label>Días de Atención</label>
@@ -658,8 +732,9 @@
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { allTurnos, updateTurno, deleteTurno, addTurno, allUsers, updateUser, deleteUser, allServices, addService, updateService, deleteService, botKnowledge, siteConfig } from '../store'
-import { db } from '../firebase'
+import { db, storage } from '../firebase'
 import { doc, setDoc } from 'firebase/firestore'
+import { ref as storageRef, uploadBytes, getDownloadURL, listAll, deleteObject } from 'firebase/storage'
 
 const router = useRouter()
 const currentTab = ref('agenda')
@@ -747,12 +822,89 @@ const editUserForm = ref({})
 const newUserForm = ref({ name: '', lastName: '', dni: '', email: '', phone: '', birthDate: '', address: '', password: '' })
 const serviceForm = ref({ title: '', description: '', icon: 'fas fa-tooth', allowedDays: [2, 4] })
 const isEditingService = ref(false)
+const isUploading = ref(false)
+const galleryFiles = ref([])
+
+const loadGallery = async () => {
+  try {
+    const listRef = storageRef(storage, 'galeria')
+    const res = await listAll(listRef)
+    const urls = await Promise.all(res.items.map(async (item) => {
+      const url = await getDownloadURL(item)
+      return { name: item.name, url, fullPath: item.fullPath }
+    }))
+    galleryFiles.value = urls
+  } catch (err) {
+    console.error("Error carrgando galeria:", err)
+  }
+}
+
+// Cargar galería al cambiar a la pestaña
+watch(currentTab, (newTab) => {
+  if (newTab === 'galeria') loadGallery()
+})
+
+const handleGalleryUpload = async (event) => {
+  const files = event.target.files
+  if (!files.length) return
+  isUploading.value = true
+  try {
+    for (const file of files) {
+      const fileRef = storageRef(storage, `galeria/${Date.now()}_${file.name}`)
+      await uploadBytes(fileRef, file)
+    }
+    await loadGallery()
+    alert('✅ Fotos subidas con éxito!')
+  } catch (err) {
+    alert('Error al subir: ' + err.message)
+  } finally {
+    isUploading.value = false
+  }
+}
+
+const deleteFromGallery = async (img) => {
+  if (!confirm('¿Eliminar esta imagen de la galería?')) return
+  try {
+    const fileRef = storageRef(storage, img.fullPath)
+    await deleteObject(fileRef)
+    await loadGallery()
+  } catch (err) {
+    alert('Error al borrar: ' + err.message)
+  }
+}
+
+const handleDirectUpload = async (event, target) => {
+  const file = event.target.files[0]
+  if (!file) return
+  isUploading.value = true
+  try {
+    const fileRef = storageRef(storage, `site/${target}_${Date.now()}_${file.name}`)
+    await uploadBytes(fileRef, file)
+    const url = await getDownloadURL(fileRef)
+    
+    if (target === 'hero') siteConfig.value.heroImage = url
+    if (target === 'about') siteConfig.value.aboutImage = url
+    if (target === 'service') serviceForm.value.image = url
+    
+    alert('✅ Imagen subida y aplicada con éxito!')
+  } catch (err) {
+    alert('Error al subir: ' + err.message)
+  } finally {
+    isUploading.value = false
+  }
+}
+
+const copyToClipboard = (text) => {
+  navigator.clipboard.writeText(text)
+  alert('¡Link copiado al portapapeles!')
+}
 
 const tabs = [
   { id: 'solicitudes', name: 'Solicitudes', icon: 'fas fa-bell' },
-  { id: 'agenda', name: 'Agenda/Calendario', icon: 'fas fa-calendar-alt' },
+  { id: 'agenda', name: 'Agenda', icon: 'fas fa-calendar-alt' },
   { id: 'usuarios', name: 'Pacientes', icon: 'fas fa-users' },
   { id: 'servicios', name: 'Servicios', icon: 'fas fa-list' },
+  { id: 'galeria', name: 'Galería/Fotos', icon: 'fas fa-images' },
   { id: 'chatbot', name: 'ChatBot AI', icon: 'fas fa-robot' },
   { id: 'web', name: 'Web / Nube', icon: 'fas fa-globe' }
 ]
@@ -1066,5 +1218,26 @@ input:focus + .slider { box-shadow: 0 0 1px #0e7490; }
 input:checked + .slider:before { transform: translateX(20px); }
 .slider.round { border-radius: 34px; }
 .slider.round:before { border-radius: 50%; }
+
+
+/* Gallery Admin Styles */
+.gallery-grid-admin { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1.5rem; }
+.gallery-item-card { background: white; border-radius: 1rem; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; border: 1px solid #e2e8f0; }
+.gallery-item-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+.gallery-img-wrapper { position: relative; aspect-ratio: 1; overflow: hidden; background: #f1f5f9; }
+.gallery-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+.gallery-overlay { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.6); display: flex; align-items: center; justify-content: center; gap: 1rem; opacity: 0; transition: 0.3s; }
+.gallery-item-card:hover .gallery-overlay { opacity: 1; }
+.btn-overlay { width: 40px; height: 40px; border-radius: 50%; border: none; background: white; color: #0f172a; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+.btn-overlay:hover { transform: scale(1.1); background: #0e7490; color: white; }
+.btn-overlay.delete:hover { background: #ef4444; }
+.gallery-info { padding: 0.8rem; border-top: 1px solid #f1f5f9; }
+
+.upload-progress-bar { background: #ecfeff; color: #0e7490; padding: 1rem; border-radius: 0.8rem; font-weight: 700; display: flex; align-items: center; gap: 1rem; }
+.spinner { width: 20px; height: 20px; border: 3px solid #0e749020; border-top: 3px solid #0e7490; border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+.preview-img-admin img { width: 100%; max-height: 150px; object-fit: cover; border-radius: 0.8rem; border: 1px solid #e2e8f0; }
+.hidden { display: none; }
 
 </style>
