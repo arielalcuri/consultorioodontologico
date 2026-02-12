@@ -336,6 +336,8 @@
 </template>
 
 <script setup>
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import ChatBot from '../components/ChatBot.vue'
 import { allServices, addTurno, registerUser, siteConfig, botKnowledge, isDarkMode, currentUser, allTurnos, logout, updateTurno, deleteTurno } from '../store'
 import { db } from '../firebase'
 import { doc, getDoc } from 'firebase/firestore'
