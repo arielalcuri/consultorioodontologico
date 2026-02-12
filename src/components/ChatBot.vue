@@ -351,46 +351,45 @@ const callGeminiAI = async (userText) => {
     5. IDENTIDAD: Eres la asistente de la Dra. Adriana. No digas soy un modelo de lenguaje.
   `
 
-  try {
-    const payload = {
-      contents: [
-        { role: 'user', parts: [{ text: `INSTRUCCIONES DE SISTEMA: ${clinicContext}` }] },
-        { role: 'model', parts: [{ text: 'Entendido. Actuaré como la asistente de la Dra. Adriana Pagnotta siguiendo todas sus instrucciones.' }] },
-        ...history,
-        { role: 'user', parts: [{ text: userText }] }
-      ],
-      generationConfig: {
-        temperature: 0.7,
-        topP: 0.9,
-        maxOutputTokens: 500
+  // Función interna para realizar la llamada (con soporte para reintento)
+  const performFetch = async (isRetry = false) => {
+    try {
+      const payload = {
+        contents: [
+          { role: 'user', parts: [{ text: `INSTRUCCIONES DE SISTEMA: ${clinicContext}` }] },
+          { role: 'model', parts: [{ text: 'Entendido. Actuaré como la asistente de la Dra. Adriana Pagnotta siguiendo todas sus instrucciones.' }] },
+          ...history,
+          { role: 'user', parts: [{ text: userText }] }
+        ],
+        generationConfig: { temperature: 0.7, topP: 0.9, maxOutputTokens: 500 }
       }
-    }
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${botKnowledge.value.geminiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    })
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${botKnowledge.value.geminiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
 
-    const data = await response.json()
-    
-    if (data.error) {
-       if (data.error.code === 429) {
-          console.warn("Gemini Rate Limited (429)");
-          return "¡Hola! Estoy recibiendo muchas consultas en este momento. 😅 Dame un segundo o si prefieres, puedes contactarnos directamente por WhatsApp al 11 3001-9567.";
-       }
-       console.error("Gemini API Error:", data.error);
-       return null;
-    }
+      const data = await response.json()
 
-    if (data.candidates && data.candidates[0].content) {
-      return data.candidates[0].content.parts[0].text
+      if (data.error) {
+        if (data.error.code === 429 && !isRetry) {
+          console.warn("429 Detectado. Reintentando en 2 segundos...");
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          return performFetch(true); // El reintento
+        }
+        if (data.error.code === 429) return "¡Hola! Estoy recibiendo muchas consultas. 😅 Dame un segundo o si prefieres, escríbenos al WhatsApp 11 3001-9567.";
+        return null;
+      }
+
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || null;
+    } catch (err) {
+      console.error("Gemini Error:", err);
+      return null;
     }
-    return null
-  } catch (err) {
-    console.error("Gemini Connection Error:", err)
-    return null
   }
+
+  return await performFetch();
 }
 
 // --- LÓGICA DE REGISTRO PASO A PASO ---
