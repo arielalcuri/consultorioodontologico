@@ -68,94 +68,85 @@
         </div>
       </section>
 
-      <!-- Agenda Tab (SUPERADOR CALENDAR VIEW) -->
-      <section v-if="currentTab === 'agenda'" class="tab-content agenda-zen-layout">
-        <div class="calendar-main-view">
-          <div class="calendar-card-premium glass-morphism">
-            <div class="calendar-nav-modern">
-               <div class="nav-branding">
-                  <i class="fas fa-calendar-check text-cyan-500"></i>
-                  <span>Planificación Mensual</span>
-               </div>
-               <div class="nav-controls">
-                  <button @click="prevMonth" class="btn-nav-circle"><i class="fas fa-arrow-left"></i></button>
-                  <h3 class="month-title">{{ monthNames[currentMonth] }} <span>{{ currentYear }}</span></h3>
-                  <button @click="nextMonth" class="btn-nav-circle"><i class="fas fa-arrow-right"></i></button>
-               </div>
-               <button @click="openManualTurnModal" class="btn-add-quick">
-                  <i class="fas fa-plus"></i> Nuevo Turno
-               </button>
+      <!-- Agenda Tab (MODERN LIST VIEW) -->
+      <section v-if="currentTab === 'agenda'" class="tab-content agenda-unified-layout">
+        <div class="calendar-section glass-morphism">
+          <div class="calendar-header-pro">
+            <div class="month-selector">
+              <button @click="prevMonth" class="btn-nav-flat"><i class="fas fa-chevron-left"></i></button>
+              <h3>{{ monthNames[currentMonth] }} <span>{{ currentYear }}</span></h3>
+              <button @click="nextMonth" class="btn-nav-flat"><i class="fas fa-chevron-right"></i></button>
             </div>
-            
-            <div class="calendar-grid-modern">
-              <div v-for="day in weekDays" :key="day" class="weekday-label">{{ day }}</div>
-              
-              <div v-for="n in startDayOffset" :key="'blank-'+n" class="day-cell-modern blank"></div>
-              
-              <div v-for="day in daysInMonth" :key="day" 
-                   class="day-cell-modern" 
-                   :class="{ 
-                      'is-today': isToday(day), 
-                      'is-selected': selectedDay === day, 
-                      'is-past': isPastDay(day),
-                      'has-activity': getTurnsForDay(day).length > 0 
-                   }"
-                   @click="selectDay(day)">
-                <span class="day-number">{{ day }}</span>
-                <div class="activity-dots">
-                   <span v-if="getTurnStats(day).orto > 0" class="dot dot-orto" :title="getTurnStats(day).orto + ' Ortodoncia'"></span>
-                   <span v-if="getTurnStats(day).gral > 0" class="dot dot-gral" :title="getTurnStats(day).gral + ' Gral'"></span>
-                </div>
+            <button @click="openManualTurnModal" class="btn btn-primary">
+              <i class="fas fa-plus"></i> Asignar Turno Manual
+            </button>
+          </div>
+          
+          <div class="calendar-grid-pro">
+            <div v-for="day in weekDays" :key="day" class="weekday-pro">{{ day }}</div>
+            <div v-for="n in startDayOffset" :key="'blank-'+n" class="day-cell-pro blank"></div>
+            <div v-for="day in daysInMonth" :key="day" 
+                 class="day-cell-pro" 
+                 :class="{ 
+                    'today': isToday(day), 
+                    'selected': selectedDay === day, 
+                    'has-turns': getTurnsForDay(day).length > 0 
+                 }"
+                 @click="selectDay(day)">
+              <span class="day-num-pro">{{ day }}</span>
+              <div v-if="getTurnsForDay(day).length > 0" class="mini-indicators">
+                <span v-for="i in Math.min(getTurnsForDay(day).length, 3)" :key="i" class="mini-dot"></span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Sidebar Timeline View -->
-        <div class="timeline-sidebar" :class="{ 'expanded': selectedDay }">
-          <div v-if="selectedDay" class="timeline-container scale-in">
-            <div class="timeline-header">
-               <div class="date-badge">
-                  <span class="day-name">{{ weekDays[new Date(currentYear, currentMonth, selectedDay).getDay()] }}</span>
-                  <span class="day-full">{{ selectedDay }} de {{ monthNames[currentMonth] }}</span>
-               </div>
-               <button @click="selectedDay = null" class="btn-close-timeline"><i class="fas fa-times"></i></button>
+        <div v-if="selectedDay" class="agenda-list-section mt-8 scale-in">
+          <div class="section-header-flex">
+            <h3>Turnos para el {{ selectedDay }} de {{ monthNames[currentMonth] }}</h3>
+            <div class="stats-pills">
+               <span class="pill pill-orto">{{ getTurnStats(selectedDay).orto }} Ortodoncia</span>
+               <span class="pill pill-gral">{{ getTurnStats(selectedDay).gral }} General</span>
             </div>
+          </div>
 
-            <div class="timeline-feed">
-               <div v-if="getTurnsForDay(selectedDay).length > 0" class="feed-wrapper">
-                  <div v-for="turno in getTurnsForDay(selectedDay).sort((a,b) => a.assignedTime.localeCompare(b.assignedTime))" 
-                       :key="turno.id" 
-                       class="timeline-card"
-                       :class="isOrto(turno.type) ? 'card-orto' : 'card-gral'">
-                     <div class="card-time">{{ turno.assignedTime }}hs</div>
-                     <div class="card-content">
-                        <h4>{{ turno.lastName }}, {{ turno.firstName }}</h4>
-                        <span class="treatment-tag">{{ turno.type }}</span>
-                        <div class="card-actions-quick">
-                           <a :href="'https://wa.me/549' + turno.phone?.replace(/\D/g,'')" target="_blank" class="action-btn wa" title="WhatsApp">
-                              <i class="fab fa-whatsapp"></i>
-                           </a>
-                           <button @click="openEditModal(turno)" class="action-btn edit" title="Editar">
-                              <i class="fas fa-edit"></i>
-                           </button>
-                           <button @click="handleDelete(turno.id)" class="action-btn delete" title="Eliminar">
-                              <i class="fas fa-trash"></i>
-                           </button>
-                        </div>
-                     </div>
-                  </div>
-               </div>
-               <div v-else class="empty-feed">
-                  <div class="zen-empty-icon">🧘‍♂️</div>
-                  <p>Sin turnos programados.<br>Día de descanso.</p>
-               </div>
+          <div v-if="getTurnsForDay(selectedDay).length > 0" class="appointments-grid">
+            <div v-for="turno in getTurnsForDay(selectedDay).sort((a,b) => a.assignedTime.localeCompare(b.assignedTime))" 
+                 :key="turno.id" 
+                 class="patient-card-row"
+                 :class="isOrto(turno.type) ? 'border-orto' : 'border-gral'">
+              <div class="patient-time">
+                <i class="far fa-clock"></i>
+                <span>{{ turno.assignedTime }}hs</span>
+              </div>
+              <div class="patient-info-main">
+                <h4>{{ turno.lastName }}, {{ turno.firstName }}</h4>
+                <div class="patient-meta">
+                   <span><i class="fas fa-id-card"></i> {{ turno.dni }}</span>
+                   <span><i class="fas fa-teeth"></i> {{ turno.type }}</span>
+                </div>
+              </div>
+              <div class="patient-actions-list">
+                <a :href="'https://wa.me/549' + turno.phone?.replace(/\D/g,'')" target="_blank" class="btn-action-round wa" title="WhatsApp">
+                  <i class="fab fa-whatsapp"></i> Chat
+                </a>
+                <button @click="openEditModal(turno)" class="btn-action-round edit" title="Editar">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button @click="handleDelete(turno.id)" class="btn-action-round delete" title="Eliminar">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
             </div>
           </div>
-          <div v-else class="timeline-placeholder">
-             <i class="fas fa-calendar-day"></i>
-             <p>Selecciona un día en el calendario para ver el detalle de la agenda.</p>
+          <div v-else class="no-data-card">
+            <i class="fas fa-calendar-day mb-3"></i>
+            <p>No hay turnos confirmados para esta fecha.</p>
           </div>
+        </div>
+        <div v-else class="select-day-prompt card-modern">
+           <i class="fas fa-hand-pointer mb-4"></i>
+           <p>Selecciona un día en el calendario para gestionar la lista de turnos.</p>
         </div>
       </section>
 
@@ -1240,82 +1231,59 @@ input:checked + .slider:before { transform: translateX(20px); }
 .slider.round { border-radius: 34px; }
 .slider.round:before { border-radius: 50%; }
 
+/* UNIFIED LIST AGENDA (REFINED) */
+.agenda-unified-layout { display: flex; flex-direction: column; gap: 2rem; }
+.calendar-section { background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+.calendar-header-pro { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.month-selector { display: flex; align-items: center; gap: 1.5rem; }
+.month-selector h3 { font-size: 1.6rem; font-weight: 800; color: #0f172a; }
+.month-selector h3 span { color: #94a3b8; font-weight: 400; }
+.btn-nav-flat { background: #f1f5f9; border: none; width: 40px; height: 40px; border-radius: 10px; cursor: pointer; transition: 0.3s; color: #64748b; }
+.btn-nav-flat:hover { background: #0e7490; color: white; transform: scale(1.05); }
 
-/* ZENITH AGENDA STYLES (SUPERADOR) */
-.agenda-zen-layout { display: flex; gap: 2rem; height: calc(100vh - 160px); align-items: stretch; }
-.calendar-main-view { flex: 1.2; position: relative; }
-.calendar-card-premium { background: white; border-radius: 2rem; padding: 2rem; box-shadow: 0 20px 50px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.8); height: 100%; display: flex; flex-direction: column; }
+.calendar-grid-pro { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+.weekday-pro { text-align: center; font-size: 0.75rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; padding-bottom: 1rem; }
+.day-cell-pro { aspect-ratio: 1.2; background: #f8fafc; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; position: relative; border: 1px solid transparent; }
+.day-cell-pro:hover { background: white; border-color: #0e7490; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+.day-cell-pro.today { background: #ecfeff; border-color: #22d3ee; }
+.day-cell-pro.selected { background: #0e7490; color: white; transform: scale(1.05); z-index: 2; box-shadow: 0 10px 20px rgba(14, 116, 144, 0.2); }
+.day-cell-pro.selected .day-num-pro { color: white; }
+.day-num-pro { font-weight: 700; font-size: 1.1rem; color: #334155; }
 
-.calendar-nav-modern { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-.nav-branding { display: flex; align-items: center; gap: 0.8rem; font-weight: 800; color: #1e293b; font-size: 1.1rem; }
-.nav-controls { display: flex; align-items: center; gap: 1.5rem; }
-.month-title { font-size: 1.5rem; font-weight: 800; min-width: 200px; text-align: center; color: #0f172a; }
-.month-title span { color: #94a3b8; font-weight: 400; }
-.btn-nav-circle { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #e2e8f0; background: white; cursor: pointer; transition: 0.3s; color: #64748b; }
-.btn-nav-circle:hover { background: #0e7490; color: white; border-color: #0e7490; transform: scale(1.1); }
-.btn-add-quick { background: #0e7490; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 0.5rem; }
-.btn-add-quick:hover { background: #0891b2; transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(14, 116, 144, 0.3); }
+.mini-indicators { display: flex; gap: 3px; position: absolute; bottom: 8px; }
+.mini-dot { width: 4px; height: 4px; border-radius: 50%; background: #94a3b8; }
+.selected .mini-dot { background: rgba(255,255,255,0.6); }
 
-.calendar-grid-modern { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; flex: 1; }
-.weekday-label { text-align: center; font-size: 0.75rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em; padding-bottom: 1rem; }
-.day-cell-modern { aspect-ratio: 1; background: #f8fafc; border-radius: 18px; position: relative; cursor: pointer; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.day-cell-modern:hover { transform: scale(1.05); background: white; box-shadow: 0 10px 20px rgba(0,0,0,0.05); z-index: 2; }
-.day-number { font-size: 1.2rem; font-weight: 700; color: #475569; transition: 0.3s; }
-.day-cell-modern.is-today { background: #ecfeff; border: 2px solid #22d3ee; }
-.day-cell-modern.is-today .day-number { color: #0e7490; }
-.day-cell-modern.is-selected { background: #0e7490; transform: scale(1.1); z-index: 3; box-shadow: 0 15px 30px rgba(14, 116, 144, 0.3); }
-.day-cell-modern.is-selected .day-number { color: white; }
-.day-cell-modern.is-past { opacity: 0.4; }
-.day-cell-modern.blank { background: transparent; cursor: default; }
+/* LIST SECTION */
+.section-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.stats-pills { display: flex; gap: 8px; }
+.pill { padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+.pill-orto { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+.pill-gral { background: #ecfeff; color: #0e7490; border: 1px solid #a5f3fc; }
 
-.activity-dots { position: absolute; bottom: 12px; display: flex; gap: 4px; }
-.dot { width: 6px; height: 6px; border-radius: 50%; }
-.dot-orto { background: #fbbf24; box-shadow: 0 0 10px #fbbf24; }
-.dot-gral { background: #22d3ee; box-shadow: 0 0 10px #22d3ee; }
-.is-selected .dot { background: white; box-shadow: none; }
+.appointments-grid { display: flex; flex-direction: column; gap: 12px; }
+.patient-card-row { background: white; padding: 1rem 1.5rem; border-radius: 1rem; display: grid; grid-template-columns: 100px 1fr auto; align-items: center; gap: 1.5rem; transition: 0.3s; border-left: 8px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+.patient-card-row:hover { transform: translateX(5px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+.border-orto { border-left-color: #fbbf24; }
+.border-gral { border-left-color: #22d3ee; }
 
-/* TIMELINE SIDEBAR */
-.timeline-sidebar { flex: 0.8; background: #f1f5f9; border-radius: 2rem; border: 1px solid #e2e8f0; overflow: hidden; position: relative; transition: 0.5s; }
-.timeline-sidebar.expanded { background: white; box-shadow: -10px 0 50px rgba(0,0,0,0.03); }
-.timeline-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #94a3b8; text-align: center; padding: 2rem; }
-.timeline-placeholder i { font-size: 3rem; margin-bottom: 1.5rem; opacity: 0.2; }
+.patient-time { font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px; font-size: 1rem; }
+.patient-time i { color: #94a3b8; font-size: 0.9rem; }
+.patient-info-main h4 { font-size: 1.1rem; color: #1e293b; margin-bottom: 0.2rem; }
+.patient-meta { display: flex; gap: 1.5rem; font-size: 0.85rem; color: #64748b; }
+.patient-meta span { display: flex; align-items: center; gap: 6px; }
 
-.timeline-container { height: 100%; display: flex; flex-direction: column; }
-.timeline-header { padding: 2rem; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: flex-start; }
-.date-badge .day-name { display: block; font-size: 0.8rem; text-transform: uppercase; font-weight: 800; color: #0e7490; letter-spacing: 0.1em; }
-.date-badge .day-full { font-size: 1.4rem; font-weight: 800; color: #0f172a; }
-.btn-close-timeline { background: #f1f5f9; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; transition: 0.3s; }
-.btn-close-timeline:hover { background: #ef4444; color: white; transform: rotate(90deg); }
+.patient-actions-list { display: flex; gap: 10px; }
+.btn-action-round { padding: 0.5rem 1rem; border-radius: 10px; border: none; cursor: pointer; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; transition: 0.3s; text-decoration: none; }
+.btn-action-round.wa { background: #22c55e; color: white; }
+.btn-action-round.edit { background: #f1f5f9; color: #475569; }
+.btn-action-round.delete { background: #fee2e2; color: #ef4444; }
+.btn-action-round:hover { opacity: 0.9; transform: translateY(-2px); }
 
-.timeline-feed { flex: 1; overflow-y: auto; padding: 1.5rem; }
-.feed-wrapper { position: relative; padding-left: 2rem; }
-.feed-wrapper::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: #e2e8f0; border-radius: 1px; }
+.no-data-card, .select-day-prompt { background: white; padding: 4rem 2rem; border-radius: 1.5rem; text-align: center; color: #94a3b8; border: 2px dashed #e2e8f0; }
+.select-day-prompt i { font-size: 3rem; opacity: 0.2; }
 
-.timeline-card { background: #f8fafc; border-radius: 1.2rem; padding: 1.2rem; margin-bottom: 1.5rem; position: relative; border: 1px solid #f1f5f9; transition: 0.3s; }
-.timeline-card::after { content: ''; position: absolute; left: -36px; top: 22px; width: 10px; height: 10px; border-radius: 50%; background: #e2e8f0; border: 3px solid white; box-shadow: 0 0 0 4px #f8fafc; }
-.timeline-card:hover { transform: translateX(8px); box-shadow: 0 10px 25px rgba(0,0,0,0.05); background: white; }
-
-.card-time { font-weight: 800; color: #94a3b8; font-size: 0.85rem; margin-bottom: 0.4rem; }
-.timeline-card h4 { font-size: 1.1rem; color: #1e293b; margin-bottom: 0.2rem; }
-.treatment-tag { display: inline-block; font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 6px; }
-
-.card-gral { border-left: 6px solid #22d3ee; }
-.card-gral .treatment-tag { background: #ecfeff; color: #0e7490; }
-.card-orto { border-left: 6px solid #fbbf24; }
-.card-orto .treatment-tag { background: #fffbeb; color: #b45309; }
-
-.card-actions-quick { display: flex; gap: 8px; margin-top: 1rem; opacity: 0; transition: 0.3s; }
-.timeline-card:hover .card-actions-quick { opacity: 1; }
-.action-btn { width: 32px; height: 32px; border-radius: 8px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; font-size: 0.9rem; }
-.action-btn.wa { background: #dcfce7; color: #15803d; }
-.action-btn.edit { background: #f1f5f9; color: #475569; }
-.action-btn.delete { background: #fef2f2; color: #b91c1c; }
-.action-btn:hover { transform: scale(1.1); }
-
-.empty-feed { text-align: center; padding: 4rem 1rem; color: #94a3b8; }
-.zen-empty-icon { font-size: 3rem; margin-bottom: 1rem; }
-
-/* Galeria Admin Styles */
+/* Gallery Admin Styles */
 .gallery-grid-admin { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1.5rem; }
 .gallery-item-card { background: white; border-radius: 1rem; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; border: 1px solid #e2e8f0; }
 .gallery-item-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
