@@ -251,6 +251,27 @@ export const updateSiteConfig = (newData) => {
     siteConfig.value = { ...siteConfig.value, ...newData }
 }
 
+// --- CLOUD INITIALIZATION ACTION ---
+export const loadInitialData = async () => {
+    try {
+        // Cargar Site Config
+        const siteDoc = await getDoc(doc(db, 'config', 'site'))
+        if (siteDoc.exists()) siteConfig.value = { ...siteConfig.value, ...siteDoc.data() }
+
+        // Cargar Chatbot Info
+        const botDoc = await getDoc(doc(db, 'config', 'chatbot'))
+        if (botDoc.exists()) botKnowledge.value = { ...botKnowledge.value, ...botDoc.data() }
+
+        // Cargar Servicios
+        const srvDoc = await getDoc(doc(db, 'config', 'services'))
+        if (srvDoc.exists() && srvDoc.data().list) allServices.value = srvDoc.data().list
+
+        console.log("✅ Datos de la nube cargados correctamente.")
+    } catch (err) {
+        console.error("Error al cargar datos iniciales de Firebase:", err)
+    }
+}
+
 // --- SESSION & UI STATE ---
 export const currentUser = ref(JSON.parse(localStorage.getItem('dental_clinic_current_user') || 'null'))
 watch(currentUser, (val) => {

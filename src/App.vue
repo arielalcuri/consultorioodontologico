@@ -3,7 +3,12 @@
 </template>
 
 <script setup>
-// Main layout container
+import { onMounted } from 'vue'
+import { loadInitialData } from './store'
+
+onMounted(() => {
+    loadInitialData()
+})
 </script>
 
 <style>
