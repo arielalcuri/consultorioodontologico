@@ -61,9 +61,9 @@
         </router-link>
         
         <div class="nav-links">
-          <a href="#inicio" class="nav-link">Inicio</a>
-          <a href="#servicios" class="nav-link">Tratamientos</a>
-          <a href="#nosotros" class="nav-link">Nosotros</a>
+          <router-link to="/" class="nav-link">Inicio</router-link>
+          <router-link to="/servicios" class="nav-link">Tratamientos</router-link>
+          <router-link to="/nosotros" class="nav-link">Nosotros</router-link>
           <router-link to="/pacientes" class="nav-link patient-link">Pacientes</router-link>
           <router-link to="/login" class="nav-link admin-link">Acceso Profesional</router-link>
         </div>
@@ -97,9 +97,9 @@
         &times;
       </button>
       <div class="mobile-links">
-        <a href="#inicio" @click="menuOpen = false">Inicio</a>
-        <a href="#servicios" @click="menuOpen = false">Tratamientos</a>
-        <a href="#nosotros" @click="menuOpen = false">Nosotros</a>
+        <router-link to="/" @click="menuOpen = false">Inicio</router-link>
+        <router-link to="/servicios" @click="menuOpen = false">Tratamientos</router-link>
+        <router-link to="/nosotros" @click="menuOpen = false">Nosotros</router-link>
         <router-link to="/pacientes" @click="menuOpen = false">Pacientes</router-link>
         <router-link to="/login" class="text-sm font-semibold !text-slate-400 mt-2" @click="menuOpen = false">Acceso Profesional</router-link>
         <button @click="{ openBookingModal(); menuOpen = false }" class="btn btn-primary mt-4">Reservar Cita</button>
@@ -121,7 +121,7 @@
           </p>
           <div class="hero-buttons">
             <button @click="openBookingModal" class="btn btn-primary btn-lg">Agendar ahora</button>
-            <a href="#servicios" class="btn btn-outline btn-lg">Nuestros servicios</a>
+            <router-link to="/servicios" class="btn btn-outline btn-lg">Nuestros servicios</router-link>
           </div>
         </div>
         <div class="hero-image-wrapper">
