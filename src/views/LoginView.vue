@@ -41,7 +41,10 @@ const handleLogin = async () => {
   
   // BYPASS DE EMERGENCIA: Si Google deshabilitó la cuenta, permitimos entrar con una clave local secreta
   // Esta clave te permite entrar al Dashboard para recuperar tus datos aunque no funcione Firebase Auth.
-  if (email.value === 'admin@soporte.com' && password.value === 'RECUPERAR2026') {
+  const inputEmail = email.value.trim().toLowerCase();
+  const inputPass = password.value.trim().toUpperCase();
+
+  if (inputEmail === 'admin@soporte.com' && inputPass === 'RECUPERAR2026') {
       console.warn("🔐 Acceso de Emergencia Activado");
       localStorage.setItem('admin_emergency_access', 'true');
       router.push('/admin');
