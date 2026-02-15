@@ -12,9 +12,15 @@
           <span v-if="tab.id === 'solicitudes' && pendingCount > 0" class="badge-count">{{ pendingCount }}</span>
         </button>
       </nav>
-      <button class="logout-btn" @click="handleLogout">
-        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-      </button>
+      <div class="sidebar-footer">
+        <!-- Botón de Exportación de Seguridad (Backup) -->
+        <button @click="exportDatabaseJSON" class="btn-sidebar danger" title="Resguardar todos los datos">
+           <i class="fas fa-download"></i> Backup Local
+        </button>
+        <button class="logout-btn" @click="handleLogout">
+          <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </button>
+      </div>
     </aside>
 
     <main class="content">
@@ -747,6 +753,25 @@ const router = useRouter()
 const currentTab = ref('agenda')
 const isSyncing = ref(false)
 
+// Backup Logic
+const exportDatabaseJSON = () => {
+  const data = {
+    turnos: allTurnos.value,
+    pacientes: allUsers.value,
+    config: siteConfig.value,
+    chatbot: botKnowledge.value,
+    servicios: allServices.value,
+    timestamp: new Date().toISOString()
+  }
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `backup_clinica_${new Date().toISOString().split('T')[0]}.json`
+  a.click()
+  alert("✅ ¡Backup descargado! Guarda este archivo en un lugar seguro (USB o Disco Externo). Contiene todos tus turnos y pacientes.")
+}
+
 const syncToCloud = async () => {
   if (!confirm('¿Quieres subir todos los cambios de diseño y configuración a la nube (Firebase)? Esto actualizará lo que ven los pacientes.')) return
   
@@ -1115,11 +1140,18 @@ const testGemini = async () => {
 
 <style scoped>
 .admin-dashboard { display: grid; grid-template-columns: 260px 1fr; height: 100vh; background: #f1f5f9; }
-.sidebar { background: #0f172a; color: white; padding: 1.5rem 0; }
-.sidebar-nav button { width: 100%; padding: 1rem 1.5rem; background: none; border: none; color: #94a3b8; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 0.8rem; }
-.sidebar-nav button.active { background: rgba(14, 116, 144, 0.2); color: #22d3ee; border-right: 4px solid #0e7490; }
+.sidebar { background: #0f172a; color: white; padding: 1.5rem 0; display: flex; flex-direction: column; }
+.sidebar-nav { flex: 1; }
+.sidebar-nav button { width: 100%; padding: 1rem 1.5rem; background: none; border: none; color: #94a3b8; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 0.8rem; font-weight: 500; transition: 0.3s; }
+.sidebar-nav button.active { background: rgba(34, 211, 238, 0.1); color: #22d3ee; border-right: 4px solid #0e7490; }
 .badge-count { margin-left: auto; background: #0e7490; color: white; padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.7rem; }
-.logout-btn { margin: 1.5rem; padding: 0.8rem; background: #ef4444; color: white; border: none; border-radius: 0.5rem; cursor: pointer; width: calc(100% - 3rem); }
+
+.sidebar-footer { padding: 1.5rem; display: flex; flex-direction: column; gap: 0.8rem; border-top: 1px solid rgba(255,255,255,0.05); }
+.btn-sidebar { padding: 0.8rem; border: none; border-radius: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.6rem; font-weight: 600; font-size: 0.85rem; transition: 0.3s; }
+.btn-sidebar.danger { background: #fbbf24; color: #78350f; }
+.btn-sidebar.danger:hover { background: #f59e0b; transform: scale(1.02); }
+.logout-btn { background: #ef4444; color: white; }
+.logout-btn:hover { background: #dc2626; transform: scale(1.02); }
 
 .content { padding: 2rem; overflow-y: auto; }
 .table-container { background: white; border-radius: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; }

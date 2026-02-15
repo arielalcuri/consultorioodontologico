@@ -39,16 +39,25 @@ const router = useRouter()
 const handleLogin = async () => {
   if (!email.value || !password.value) return
   
+  // BYPASS DE EMERGENCIA: Si Google deshabilitó la cuenta, permitimos entrar con una clave local secreta
+  // Esta clave te permite entrar al Dashboard para recuperar tus datos aunque no funcione Firebase Auth.
+  if (email.value === 'admin@soporte.com' && password.value === 'RECUPERAR2026') {
+      console.warn("🔐 Acceso de Emergencia Activado");
+      localStorage.setItem('admin_emergency_access', 'true');
+      router.push('/admin');
+      return;
+  }
+
   loading.value = true
   error.value = ''
   
   try {
     await signInWithEmailAndPassword(auth, email.value, password.value)
-    // En una app real podrías verificar el rol aquí, pero por ahora permitimos acceso
+    localStorage.removeItem('admin_emergency_access');
     router.push('/admin')
   } catch (err) {
     console.error('Login error:', err)
-    error.value = 'Email o contraseña incorrectos.'
+    error.value = 'Email o contraseña incorrectos. Si perdiste acceso a tu Gmail, contactame para usar la clave de emergencia.'
   } finally {
     loading.value = false
   }
